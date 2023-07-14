@@ -1,0 +1,94 @@
+@import url('https://fonts.googleapis.com/css2?family=Cabin:wght@500&family=Roboto:wght@700&display=swap');
+
+* {
+    border: 2px solid red;
+}
+
+body {
+    background-image: url("../img/acoustic-guitar.jpeg");
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center center;
+    background-color: black;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+h1 {
+    color: #e5ba88;
+    text-align: center;
+    font-size: 70px;
+    font-family: 'roboto';
+    margin-bottom: 0%;
+    background-color: black;
+    padding: 25px;
+}
+
+.direction-container {
+    background-color: rgba(157, 147, 148, .7);
+    border-radius: 20px;
+    width: 40%;
+    padding: 35px;
+    margin-top: 0%;
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.direction-container > a {
+    text-decoration: none;
+    color: #352a23;
+    background-color: #a0a088;
+    border: 2px solid white;
+    padding: 30px;
+    font-size: 35px;
+    border-radius: 25px;
+    font-weight: 800;
+    font-family: 'cabin';
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.direction-container > a:hover {
+    transform: scale(1.3);
+}
+
+.direction-container > a:active {
+    transform: scale(.9);
+}
+
+.footer {
+    background-color: #e5ba88;
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    color: #352a23;
+    padding-left: 10px;
+    padding-right: 10px;
+    font-size: 15px;
+    font-family: 'cabin';
+}
+
+.library-body {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    background-color: black;
+    background-image: none;
+}
+
+.library-body > img {
+    width: 400px;
+}
+
+.content-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100vh;
+    width: 50%;
+}
