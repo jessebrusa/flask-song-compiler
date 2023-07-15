@@ -65,13 +65,13 @@ h1 {
     background-color: #e5ba88;
     display: flex;
     width: 100%;
-
     justify-content: space-between;
     color: #352a23;
     padding-left: 10px;
     padding-right: 10px;
     font-size: 15px;
     font-family: 'cabin';
+    box-sizing: border-box;
 }
 
 .library-body {
@@ -87,18 +87,13 @@ h1 {
     width: 400px;
 }
 
-.content-container {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    height: 100vh;
-    width: 50%;
-}
+
 
 .music-card-container {
     display: flex;
-    justify-content: center;
+    justify-content: space-evenly;
     flex-wrap: wrap;
+    width: 80%;
     gap: 50px;
     margin: 50px;
 }
@@ -112,13 +107,31 @@ h1 {
     background-color: #9d9394;
     justify-content: center;
     width: 300px;
-    height: 200px;
-    
+    height: 400px;
+    gap: 25px;
+}
+
+.music-card:hover {
+    transform: scale(1.15);
 }
 
 .music-card h2 {
     text-align: center;
     color: black;
+    margin: 0;
+    font-size: 30px;
+    font-family: 'cabin';
+}
+
+.music-card h3 {
+    font-size: 20px;
+    font-family: 'cabin';
+    margin: 0;
+}
+
+.music-card img {
+    width: 200px;
+    height: auto;
 }
 
 @media screen and (max-width: 1700px) {

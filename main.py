@@ -13,8 +13,14 @@ def home_page():
 
 @app.route('/library')
 def library():
-    song_list = sorted(os.listdir('./static/music'))[1:]
-    return render_template('library.html', song_list=song_list)
+    song_folders = sorted(os.listdir('./static/music'))[1:]
+
+    song_info = []
+    for song_folder in song_folders:
+        with open(f"./static/music/{song_folder}/info.txt", "r") as file:
+            song_info.append(file.read().splitlines())
+
+    return render_template('library.html', song_info=song_info)
 
 
 if __name__ == '__main__':
