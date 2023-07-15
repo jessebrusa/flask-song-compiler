@@ -1,4 +1,7 @@
 from flask import Flask, render_template, request, url_for, redirect
+from img_search import get_google_img
+import os
+
 
 app = Flask(__name__)
 
@@ -10,7 +13,8 @@ def home_page():
 
 @app.route('/library')
 def library():
-    return render_template('library.html')
+    song_list = sorted(os.listdir('./static/music'))[1:]
+    return render_template('library.html', song_list=song_list)
 
 
 if __name__ == '__main__':

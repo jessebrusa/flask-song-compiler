@@ -7,12 +7,18 @@
     <title>Music Library</title>
 </head>
 <body class="library-body">
-    <img src="../static/img/left-guitar.png" alt="electric guitar facing inward from the left">
-    <div class="content-container">
         <h1>Music Library</h1>
-        <h2>testing</h2>
-        <h3>testing</h3>
-    </div>
-    <img src="../static/img/right-guitar.jpg" alt="electri guitar facing inward from the right">
+        <div class="music-card-container">
+            {% for song in song_list %}
+                <div class="music-card">
+                    <h2>{{ song }}</h2>
+                </div>
+            {% endfor %}
+        </div>
+        <div class="footer">
+            <p>Webpage by: Jesse Brusa</p>
+            <p>Song Compiler</p>
+            <p>© Copyright 2023</p>
+        </div>    
 </body>
 </html>
