@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/css/stylesheet.css">
+    <title>{{ title }}</title>
+</head>
+<body>
+    <div class="hero-container">
+        <div class="nav-links">
+            <a href="{{ url_for('home_page') }}">Home</a>
+            <a href="{{ url_for('library') }}">Library</a>
+        </div>
+        <div class="hero-text-container">
+            <h1>{{ title }}</h1>
+            <h2>{{ artist }}</h2>
+        </div>
+        <div class="hero-img-container">
+            <img src="{{ img_url }}" alt="picture of song and or songs artist">
+        </div>
+    </div>
+</body>
+</html>

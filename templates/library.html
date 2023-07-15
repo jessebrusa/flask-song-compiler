@@ -10,11 +10,13 @@
         <h1>Music Library</h1>
         <div class="music-card-container">
             {% for song in song_info %}
-                <div class="music-card">
+                <a href="{{ url_for('song_page', song=song[3]) }}"><div class="music-card">
                     <h2>{{ song[0] }}</h2>
                     <h3>{{ song[1] }}</h3>
-                    <img src="{{ song[2] }}" alt="picture of song and or songs artist">
-                </div>
+                    <div class="img-container-library">
+                        <img src="{{ song[2] }}" alt="picture of song and or songs artist">
+                    </div>
+                </div></a>
             {% endfor %}
         </div>
         <div class="footer">
