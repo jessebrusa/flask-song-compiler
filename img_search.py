@@ -19,5 +19,5 @@ def get_google_img(query, api_key, cx):
     return None
 
 # Set your API key and CX (Custom Search Engine ID) here
-api_key = "AIzaSyBtuoL2-dL71kSmh6sPsrLSSpgn1thUYJg"
-cx = "15d5cf5fb6e3c484c"
+# api_key = "AIzaSyBtuoL2-dL71kSmh6sPsrLSSpgn1thUYJg"
+# cx = "15d5cf5fb6e3c484c"

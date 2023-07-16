@@ -22,12 +22,17 @@
     </div>
     <div class="music-player">
         <div class="mp3-container">
-            <h3>MP3 File</h3>
+            <h3>MP3</h3>
             <audio controls src="{{ mp3_path }}"></audio>
         </div>
         <div class="karaoke-container">
-            <h3>Get Karaoke</h3>
-            <a href="#">Click Here</a>
+            {% if karaoke_path %}  
+                <h3>Karaoke</h3>
+                <audio controls src="{{ karaoke_path }}"></audio>
+            {% else %}
+                <h3>Get Karaoke</h3>
+                <a href="{{ url_for('get_karaoke', song=title) }}">Click Here</a>
+            {% endif %}
         </div>
     </div>
     <div class="lyrics-container">
