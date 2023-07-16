@@ -38,9 +38,13 @@ def song_page(song):
     path = f'./static/music/{song}/'
     folder_items = os.listdir(path)
 
-    # lyric_path = f"{path}{folder_items[1]}"
-    # with open(lyric_path, 'r') as file:
-    #     lyrics = file.read()
+    if f'{title.title()} - {artist}.txt' in folder_items:
+        lyric_item = f'{title} - {artist}.txt'
+        print(lyric_item)
+
+        with open(f'./static/music/{song}/{lyric_item}', 'r') as file:
+            lyrics = file.readlines()
+            lyrics = [lyric.strip('\n') for lyric in lyrics]
 
     if '.pdf' in folder_items[-1]:
         pdf_path = f"{path}{folder_items[-1]}"
@@ -50,7 +54,8 @@ def song_page(song):
 
 
     return render_template('song-page.html', title=title,
-                           artist=artist, img_url=img_url)
+                           artist=artist, img_url=img_url,
+                           lyrics=lyrics)
 
 
 if __name__ == '__main__':

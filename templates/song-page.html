@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="../static/css/stylesheet.css">
     <title>{{ title }}</title>
 </head>
-<body>
+<body class="song-page-body">
     <div class="hero-container">
         <div class="nav-links">
             <a href="{{ url_for('home_page') }}">Home</a>
@@ -19,6 +19,16 @@
         <div class="hero-img-container">
             <img src="{{ img_url }}" alt="picture of song and or songs artist">
         </div>
+    </div>
+    <div class="music-player">
+        
+    </div>
+    <div class="lyrics-container">
+        <p>
+            {% for lyric in lyrics %}
+                {{ lyric }}<br>
+            {% endfor %}
+        </p>
     </div>
 </body>
 </html>
