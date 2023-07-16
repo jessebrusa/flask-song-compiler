@@ -28,24 +28,30 @@ folder_items = os.listdir(path)
 
 # lyric_path = f"{path}{folder_items[1]}"
 
-print(title.title())
+# print(title.title())
 
-if f'{title.title()} - {artist}.txt' in folder_items:
-    lyric_item = f'{title} - {artist}.txt'
-    print(lyric_item)
+# if f'{title.title()} - {artist}.txt' in folder_items:
+#     lyric_item = f'{title} - {artist}.txt'
+#     print(lyric_item)
 
-    with open(f'./static/music/{song}/{lyric_item}') as file:
-        lyrics = file.read()
+#     with open(f'./static/music/{song}/{lyric_item}') as file:
+#         lyrics = file.read()
 
-        print(lyrics)
+#         print(lyrics)
 
-if '.pdf' in folder_items[-1]:
-    pdf_path = f"{path}{folder_items[-1]}"
+# if '.pdf' in folder_items[-1]:
+#     pdf_path = f"{path}{folder_items[-1]}"
 
-if f'{title}.mp3' in folder_items:
-    mp3_path = f'{path}{title}.mp3'
+# if f'{title}.mp3' in folder_items:
+#     mp3_path = f'{path}{title}.mp3'
 
 # with open(lyric_path, 'r') as file:
 #     lyrics = file.read()
 
 # print(lyrics)
+
+for filename in folder_items:
+     if filename.lower().endswith('.pdf'):
+        pdf_path = filename
+
+print(pdf_path)

@@ -229,9 +229,56 @@ h1 {
 
 .music-player {
     margin-top: 50px;
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    flex-wrap: wrap;
 }
 
+.mp3-container {
+    background-color: #a0a088;
+    padding: 15px;
+    font-family: 'roboto';
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 45px;
+    width: 300px;
+    font-size: 25px;
+}
 
+.karaoke-container {
+    background-color: #a0a088;
+    padding: 15px;
+    font-family: 'roboto';
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 45px;
+    width: 300px;
+    font-size: 25px;
+    padding-bottom: 10px;
+}
+
+.karaoke-container a {
+    text-decoration: none;
+    color: black;
+    background-color: #9d9394;
+    padding: 15px;
+    padding-top: 10px;
+    border-radius: 15px;
+    font-size: 20px;
+}
+
+.karaoke-container a:hover {
+    transform: scale(1.15);
+}
+
+.karaoke-container a:active {
+    transform: scale(.95);
+}
 
 .lyrics-container {
     background-color: white;
@@ -244,9 +291,17 @@ h1 {
     padding: 15px;
     font-size: 32px;
     font-family: 'roboto';
+    margin-bottom: 50px;
 }
 
-@media screen and (max-width: 1200px) {
+.pdf-container {
+    width: 90%;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 50px;
+}
+
+@media screen and (max-width: 1280px) {
     .hero-container {
         flex-direction: column;
     }
