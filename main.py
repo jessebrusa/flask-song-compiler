@@ -45,17 +45,17 @@ def song_page(song):
         with open(f'./static/music/{song}/{lyric_item}', 'r') as file:
             lyrics = file.readlines()
             lyrics = [lyric.strip('\n') for lyric in lyrics]
+            
+    if f'{song.title()}.mp3' in folder_items:
+        mp3_path = f'.{path}{song.title()}.mp3'
 
     if '.pdf' in folder_items[-1]:
         pdf_path = f"{path}{folder_items[-1]}"
 
-    if f'{title}.mp3' in folder_items:
-        mp3_path = f'{path}{title}.mp3'
-
 
     return render_template('song-page.html', title=title,
                            artist=artist, img_url=img_url,
-                           lyrics=lyrics)
+                           lyrics=lyrics, mp3_path=mp3_path)
 
 
 if __name__ == '__main__':
