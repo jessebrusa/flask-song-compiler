@@ -7,22 +7,26 @@
     <title>Music Library</title>
 </head>
 <body class="library-body">
+    <div class="library-header">
+        <a href="{{ url_for('home_page') }}">Home</a>
         <h1>Music Library</h1>
-        <div class="music-card-container">
-            {% for song in song_info %}
-                <a href="{{ url_for('song_page', song=song[3]) }}"><div class="music-card">
-                    <h2>{{ song[0] }}</h2>
-                    <h3>{{ song[1] }}</h3>
-                    <div class="img-container-library">
-                        <img src="{{ song[2] }}" alt="picture of song and or songs artist">
-                    </div>
-                </div></a>
-            {% endfor %}
-        </div>
-        <div class="footer">
-            <p>Webpage by: Jesse Brusa</p>
-            <p>Song Compiler</p>
-            <p>© Copyright 2023</p>
-        </div>    
+        <div class="temp-search"></div>
+    </div>
+    <div class="music-card-container">
+        {% for song in song_info %}
+            <a href="{{ url_for('song_page', song=song[3]) }}"><div class="music-card">
+                <h2>{{ song[0] }}</h2>
+                <h3>{{ song[1] }}</h3>
+                <div class="img-container-library">
+                    <img src="{{ song[2] }}" alt="picture of song and or songs artist">
+                </div>
+            </div></a>
+        {% endfor %}
+    </div>
+    <div class="footer">
+        <p>Webpage by: Jesse Brusa</p>
+        <p>Song Compiler</p>
+        <p>© Copyright 2023</p>
+    </div>    
 </body>
 </html>

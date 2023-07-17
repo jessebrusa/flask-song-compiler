@@ -35,7 +35,6 @@ def search_song_karaoke(song):
         download_song(f"{title.lower()} karaoke", artist.lower(), path)
         
     except FileExistsError:
-        # list_items_folder(path)
         print('No Karaoke File Found')
 
 
