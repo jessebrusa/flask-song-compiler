@@ -347,6 +347,29 @@ h1 {
     background-image: none;
 }
 
+
+form {
+    width: 60%;
+    background-color: #9d9394;
+    outline: 5px solid #352a23;
+    padding: 20px;
+    font-family: 'roboto';
+    font-size: 25px;
+    display: flex;
+    gap: 20px;
+    justify-content: flex-start;
+    align-items: center;
+    border-radius: 25px;
+}
+
+form > label {
+    min-width: 150px;
+}
+
+form > input{
+    width: 100%;
+}
+
 @media screen and (max-width: 1280px) {
     .hero-container {
         flex-direction: column;
