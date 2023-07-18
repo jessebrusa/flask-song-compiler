@@ -67,30 +67,36 @@ def song_page(song):
     artist = song_info[0][1].lower()
     img_url = song_info[0][2]
 
-    path = f'./static/music/{song}/'
+    path = f'./static/music/{title}/'
     folder_items = os.listdir(path)
 
     if f'{title} - {artist}.txt' in folder_items:
         lyric_item = f'{title} - {artist}.txt'
 
-        with open(f'./static/music/{song}/{lyric_item}', 'r') as file:
+        with open(f'./static/music/{title}/{lyric_item}', 'r') as file:
             lyrics = file.readlines()
             lyrics = [lyric.strip('\n') for lyric in lyrics]
+    else:
+        lyrics = None
 
-    if f'{song.lower()}.mp3' in folder_items:
-        mp3_path = f'.{path}{song.title()}.mp3'
 
-    print(f'{song.lower()} karaoke.mp3')
+    if f'{title}.mp3' in folder_items:
+        mp3_path = f'.{path}{title}.mp3'
+    else:
+        mp3_path = None
 
-    if f'{song.lower()} karaoke.mp3' in folder_items:
-        karaoke_path = f'.{path}{song.title()} Karaoke.mp3'
-        print(f'\n{karaoke_path}\n')
+
+    if f'{title} karaoke.mp3' in folder_items:
+        karaoke_path = f'.{path}{title} karaoke.mp3'
     else:
         karaoke_path = None
 
     for filename in folder_items:
-     if filename.lower().endswith('.pdf'):
-        pdf_path = f".{path}{filename}"
+        if filename.lower().endswith('.pdf'):
+            pdf_path = f".{path}{filename}"
+            break
+        else:
+            pdf_path = None
 
     title = title.title()
     artist = artist.title()
@@ -106,6 +112,11 @@ def song_page(song):
 def get_karaoke(song):
     search_song_karaoke(song)
     return redirect(url_for('song_page', song=song))
+
+
+@app.route('/find-song')
+def find_song():
+    return render_template('find-song.html')
 
 
 if __name__ == '__main__':

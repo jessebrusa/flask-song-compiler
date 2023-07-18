@@ -343,6 +343,10 @@ h1 {
     margin-bottom: 50px;
 }
 
+.find-song-body {
+    background-image: none;
+}
+
 @media screen and (max-width: 1280px) {
     .hero-container {
         flex-direction: column;

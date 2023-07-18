@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../static/css/stylesheet.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='../static/css/stylesheet.css') }}">
     <title>{{ title }}</title>
 </head>
 <body class="song-page-body">
@@ -22,8 +22,10 @@
     </div>
     <div class="music-player">
         <div class="mp3-container">
-            <h3>MP3</h3>
-            <audio controls src="{{ mp3_path }}"></audio>
+            {% if mp3_path %}
+                <h3>MP3</h3>
+                <audio controls src="{{ mp3_path }}"></audio>
+            {% endif %}    
         </div>
         <div class="karaoke-container">
             {% if karaoke_path %}  
@@ -31,10 +33,11 @@
                 <audio controls src="{{ karaoke_path }}"></audio>
             {% else %}
                 <h3>Get Karaoke</h3>
-                <a href="{{ url_for('get_karaoke', song=title) }}">Click Here</a>
+                <a href="{{ url_for('get_karaoke', song=song) }}">Click Here</a>
             {% endif %}
         </div>
     </div>
+    {% if lyrics %}
     <div class="lyrics-container">
         <p>
             {% for lyric in lyrics %}
@@ -42,9 +45,12 @@
             {% endfor %}
         </p>
     </div>
-    <div class="pdf-container">
-        <embed src="{{ pdf_path }}" type="application/pdf" width="95%" height="2000px" />
-    </div>
+    {% endif %}
+    {% if pdf_path %}
+        <div class="pdf-container">
+            <embed src="{{ pdf_path }}" type="application/pdf" width="95%" height="2000px" />
+        </div>
+    {% endif %}
     <div class="footer">
         <p>Webpage by: Jesse Brusa</p>
         <p>Song Compiler</p>
