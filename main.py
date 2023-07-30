@@ -89,8 +89,11 @@ def library():
 
     song_info = []
     for song_folder in song_folders:
-        with open(f"./static/music/{song_folder}/info.txt", "r") as file:
-            song_info.append(file.read().splitlines())
+        try:
+            with open(f"./static/music/{song_folder}/info.txt", "r") as file:
+                song_info.append(file.read().splitlines())
+        except:
+            pass
     for num in range(len(song_info)):
         song_info[num].append(song_folders[num])
 
@@ -103,6 +106,7 @@ def song_page(song):
     with open(f"./static/music/{song}/info.txt", "r") as file:
         song_info.append(file.read().splitlines())
 
+    original_title = song_info[0][0]
     title = song_info[0][0].lower()
     artist = song_info[0][1].lower()
     img_url = song_info[0][2]
@@ -141,7 +145,7 @@ def song_page(song):
     title = title.title()
     artist = artist.title()
 
-    return render_template('song-page.html', title=title,
+    return render_template('song-page.html', title=original_title,
                            artist=artist, img_url=img_url,
                            lyrics=lyrics, mp3_path=mp3_path,
                            pdf_path=pdf_path, karaoke_path=karaoke_path,
@@ -159,12 +163,21 @@ def find_song():
     if request.method == 'POST':
         input_title = request.form.get('title')
 
-        song_data = obtain_lyrics_create_dir(input_title)
-        title = song_data[0]
-        artist = song_data[1]
-        path = f'./static/music/{title.lower()}/'
 
-        download_song(title, artist, path)
+        try:
+            song_data = obtain_lyrics_create_dir(input_title)
+            title = song_data[0]
+            artist = song_data[1]
+            path = f'./static/music/{title.lower()}/'
+        except:
+            pass
+
+
+        try:
+            download_song(title, artist, path)
+        except:
+            pass
+
 
         try:
             chords = Chords()
@@ -175,10 +188,11 @@ def find_song():
         except:
             pass
 
+
         return redirect(url_for('song_page', song=title.lower()))        
 
     return render_template('find-song.html')
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5001)
+    app.run(debug=True, port=5000)
