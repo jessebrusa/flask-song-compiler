@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='../static/css/stylesheet.css') }}">
+    <title>{{ title }}</title>
+</head>
+<body class="song-page-body">
+    <div class="hero-container">
+        <div class="nav-links">
+            <a href="{{ url_for('find_song') }}">Find A Song</a>
+            <a href="{{ url_for('library') }}">Library</a>
+        </div>
+        <div class="hero-text-container">
+            <h1>{{ title }}</h1>
+            <h2>{{ artist }}</h2>
+        </div>
+        <div class="hero-img-container">
+            <img src="{{ img_url }}" alt="picture of song and or songs artist">
+        </div>
+    </div>
+    <div class="music-player">
+        <div class="mp3-container">
+            {% if mp3_path %}
+                <h3>MP3</h3>
+                <audio controls src="{{ mp3_path }}"></audio>
+            {% endif %}    
+        </div>
+        <div class="karaoke-container">
+            {% if karaoke_path %}  
+                <h3>Karaoke</h3>
+                <audio controls src="{{ karaoke_path }}"></audio>
+            {% else %}
+                <h3>Get Karaoke</h3>
+                <a href="{{ url_for('get_karaoke', song=song) }}">Click Here</a>
+            {% endif %}
+        </div>
+    </div>
+    {% if lyrics %}
+    <div class="lyrics-container">
+        <p>
+            {% for lyric in lyrics %}
+                {{ lyric }}<br>
+            {% endfor %}
+        </p>
+    </div>
+    {% endif %}
+    {% if pdf_path %}
+        <div class="pdf-container">
+            <embed src="{{ pdf_path }}" type="application/pdf" width="95%" height="2000px" />
+        </div>
+    {% endif %}
+    <div class="footer">
+        <p>Webpage by: Jesse Brusa</p>
+        <p>Song Compiler</p>
+        <p>© Copyright 2023</p>
+    </div>  
+</body>
+</html>

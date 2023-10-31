@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='../static/css/stylesheet.css') }}">
+    <title>Song Compiler</title>
+</head>
+<body>
+    <h1>Welcome to the Song Compiler App</h1>
+    <div class="direction-container">
+        <a href="{{ url_for('find_song') }}">Find A Song</a>
+        <a href="{{ url_for('library') }}">Song Library</a>
+    </div>
+    <div class="footer">
+        <p>Webpage by: Jesse Brusa</p>
+        <p>Song Compiler</p>
+        <p>© Copyright 2023</p>
+    </div>
+</body>
+</html>

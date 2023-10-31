@@ -1,0 +1,396 @@
+@import url('https://fonts.googleapis.com/css2?family=Cabin:wght@500&family=Roboto:wght@700&display=swap');
+
+/* * {
+    border: 2px solid red;
+} */
+
+body {
+    background-image: url("../img/acoustic-guitar.jpeg");
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center center;
+    background-color: black;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+h1 {
+    color: #e5ba88;
+    text-align: center;
+    font-size: 70px;
+    font-family: 'roboto';
+    margin-bottom: 0%;
+    background-color: black;
+    padding: 25px;
+}
+
+.direction-container {
+    background-color: rgba(157, 147, 148, .7);
+    border-radius: 20px;
+    width: 40%;
+    padding: 35px;
+    margin-top: 0%;
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.direction-container > a {
+    text-decoration: none;
+    color: #352a23;
+    background-color: #a0a088;
+    border: 2px solid white;
+    padding: 30px;
+    font-size: 35px;
+    border-radius: 25px;
+    font-weight: 800;
+    font-family: 'cabin';
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.direction-container > a:hover {
+    transform: scale(1.3);
+}
+
+.direction-container > a:active {
+    transform: scale(.9);
+}
+
+.footer {
+    background-color: #e5ba88;
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    color: #352a23;
+    padding-left: 10px;
+    padding-right: 10px;
+    font-size: 15px;
+    font-family: 'cabin';
+    box-sizing: border-box;
+}
+
+.library-body {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    background-color: black;
+    background-image: none;
+}
+
+.library-body > img {
+    width: 400px;
+}
+
+.library-body a {
+    text-decoration: none;
+}
+
+.library-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 95%;
+    margin-top: 45px;
+}
+
+.library-header h1{
+    margin: 0%;
+}
+
+.library-header > a {
+    color: white;
+    width: 160px;
+    background-color: #e5ba88;
+    border: 4px solid #9d9394;
+    border-radius: 10px;
+    font-size: 35px;
+    font-family: 'roboto';
+    padding: 20px;
+    text-decoration: none;
+    align-items: center;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    height: 60px;
+}
+
+.library-header a:hover {
+    transform: scale(1.15);
+}
+
+.library-header a:active {
+    transform: scale(.95);
+}
+
+.temp-search {
+    background-color: black;
+    width: 160px;
+}
+
+.music-card-container {
+    display: flex;
+    justify-content: space-evenly;
+    flex-wrap: wrap;
+    width: 80%;
+    gap: 50px;
+    margin: 50px;
+}
+
+.music-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    background-color: #9d9394;
+    border-radius: 20px;
+    justify-content: center;
+    width: 300px;
+    height: 400px;
+    gap: 25px;
+}
+
+.music-card:hover {
+    transform: scale(1.15);
+}
+
+.music-card h2 {
+    text-align: center;
+    color: black;
+    margin: 0;
+    font-size: 30px;
+    font-family: 'cabin';
+}
+
+.music-card h3 {
+    font-size: 20px;
+    font-family: 'cabin';
+    color: black;
+    margin: 0;
+}
+
+.music-card img {
+    width: 200px;
+    height: auto;
+}
+
+.img-container-library {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 200px;
+    height: 200px;
+}
+
+.song-page-body {
+    background-image: none;
+}
+
+.song-page-body h1 {
+    background-color: transparent;
+    margin: 0;
+    font-family: 'cabin';
+}
+
+.hero-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    margin-left: 30%;
+    margin-right: 30%;
+    width: 95%;
+    box-sizing: border-box;
+    background-color: rgba(157, 147, 148, .5);
+    border-radius: 25px;
+}
+
+.hero-text-container {
+    text-align: center;
+    margin: auto;
+    width: 500px;
+}   
+
+.hero-container h2 {
+    color: #9d9394;
+    font-size: 40px;
+    font-family: 'cabin';
+}
+
+.hero-img-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 300px;
+    margin-right: 20px;
+    padding: 10px;
+}
+
+.hero-img-container img {
+    max-width: 300px;
+}
+
+.nav-links {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    width: 300px;
+    margin-left: 20px;
+    gap: 25px;
+    padding: 10px;
+}
+
+.nav-links a{
+    color: white;
+    width: 160px;
+    background-color: #e5ba88;
+    border: 4px solid #9d9394;
+    border-radius: 10px;
+    font-size: 35px;
+    font-family: 'roboto';
+    padding: 20px;
+    text-decoration: none;
+    align-items: center;
+    text-align: center;
+}
+
+.nav-links a:hover {
+    transform: scale(1.15);
+}
+
+.nav-links a:active {
+    transform: scale(.95);
+}
+
+.music-player {
+    margin-top: 50px;
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    flex-wrap: wrap;
+}
+
+.mp3-container {
+    background-color: #a0a088;
+    padding: 15px;
+    font-family: 'roboto';
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 45px;
+    width: 300px;
+    font-size: 25px;
+}
+
+.karaoke-container {
+    background-color: #a0a088;
+    padding: 15px;
+    font-family: 'roboto';
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 45px;
+    width: 300px;
+    font-size: 25px;
+    padding-bottom: 10px;
+}
+
+.karaoke-container a {
+    text-decoration: none;
+    color: black;
+    background-color: #9d9394;
+    padding: 15px;
+    padding-top: 10px;
+    border-radius: 15px;
+    font-size: 20px;
+}
+
+.karaoke-container a:hover {
+    transform: scale(1.15);
+}
+
+.karaoke-container a:active {
+    transform: scale(.95);
+}
+
+.lyrics-container {
+    background-color: white;
+    border: #352a23;
+    border-radius: 25px;
+    width: 45%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 50px;
+    padding: 15px;
+    font-size: 32px;
+    font-family: 'roboto';
+    margin-bottom: 50px;
+}
+
+.pdf-container {
+    width: 90%;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 50px;
+}
+
+.find-song-body {
+    background-image: none;
+}
+
+
+form {
+    width: 60%;
+    background-color: #9d9394;
+    outline: 5px solid #352a23;
+    padding: 20px;
+    font-family: 'roboto';
+    font-size: 25px;
+    display: flex;
+    gap: 20px;
+    justify-content: flex-start;
+    align-items: center;
+    border-radius: 25px;
+}
+
+form > label {
+    min-width: 150px;
+}
+
+form > input{
+    width: 100%;
+}
+
+.loading-page {
+    display: flex;
+    height: 100vh;
+    justify-content: center;
+    align-items: center;
+    background-image: none;
+}
+
+
+@media screen and (max-width: 1280px) {
+    .hero-container {
+        flex-direction: column;
+    }
+}
+
+@media screen and (max-width: 1700px) {
+    .library-body {
+        flex-direction: column;
+    }
+
+    .library-body > img {
+        display: none;
+    }
+}
