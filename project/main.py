@@ -1,22 +1,24 @@
 from flask import Flask, render_template, request, url_for, redirect, request
-from pytube import YouTube
 from chords import Chords
 from resources import  obtain_lyrics_create_dir, download_song, search_song_karaoke, \
 move_from_downloads, get_google_img
+from sql import all_songs
 import psycopg2 as pg2
-import shutil
+from decouple import config
 import os
 
 
-GUITAR_EMAIL = 'jessebrusa@gmail.com'
-GUITAR_PASSWORD = '1JesusKing7'
-GOOGLE_API_KEY = "AIzaSyBtuoL2-dL71kSmh6sPsrLSSpgn1thUYJg"
-GOOGLE_CX = "15d5cf5fb6e3c484c"
+GUITAR_EMAIL = config('GUITAR_EMAIL')
+GUITAR_PASSWORD = config('GUITAR_PASSWORD')
+GOOGLE_API_KEY = config('GOOGLE_API_KEY')
+GOOGLE_CX = config('GOOGLE_CX')
+POSTGRES_PASS = config('POSTGRES_PASS')
 
 
 app = Flask(__name__)
-conn = pg2.connect(database='song_compiler_db', user='postgres', password='p48dT7k78n$G756JrcS%', port='5433')
+conn = pg2.connect(database='song_compiler_db', user='postgres', password=POSTGRES_PASS, port='5433')
 cur = conn.cursor()
+
 
 @app.route('/')
 def home_page():
@@ -25,19 +27,12 @@ def home_page():
 
 @app.route('/library')
 def library():
-    song_folders = sorted(os.listdir('./static/music'))[1:]
+    songs_sql = all_songs()
+    cur.execute(songs_sql)
+    songs = cur.fetchall()
+    print(songs)
 
-    song_info = []
-    for song_folder in song_folders:
-        try:
-            with open(f"./static/music/{song_folder}/info.txt", "r") as file:
-                song_info.append(file.read().splitlines())
-        except:
-            pass
-    for num in range(len(song_info)):
-        song_info[num].append(song_folders[num])
-
-    return render_template('library.html', song_info=song_info)
+    return render_template('library.html', songs=songs)
 
 
 @app.route('/data/<song>')

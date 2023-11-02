@@ -13,12 +13,12 @@
         <div class="temp-search"></div>
     </div>
     <div class="music-card-container">
-        {% for song in song_info %}
-            <a href="{{ url_for('song_page', song=song[0]) }}"><div class="music-card">
-                <h2>{{ song[0] }}</h2>
-                <h3>{{ song[1] }}</h3>
+        {% for song in songs %}
+            <a href="#"><div class="music-card">
+                <h2>{{ song[1] }}</h2>
+                <h3>test artist</h3>
                 <div class="img-container-library">
-                    <img src="{{ song[2] }}" alt="picture of song and or songs artist">
+                    <img src="{{ song[10] }}" alt="picture of song and or songs artist">
                 </div>
             </div></a>
         {% endfor %}

@@ -370,13 +370,6 @@ form > input{
     width: 100%;
 }
 
-.loading-page {
-    display: flex;
-    height: 100vh;
-    justify-content: center;
-    align-items: center;
-    background-image: none;
-}
 
 
 @media screen and (max-width: 1280px) {
