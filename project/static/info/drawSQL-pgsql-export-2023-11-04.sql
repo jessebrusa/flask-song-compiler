@@ -5,7 +5,7 @@ CREATE TABLE "song_search"(
 ALTER TABLE
     "song_search" ADD PRIMARY KEY("song_id", "search_id");
 CREATE TABLE "user"(
-    "user_id" SERIAL NOT NULL,
+    "user_id" bigserial NOT NULL,
     "first_name" VARCHAR(25) NOT NULL,
     "last_name" VARCHAR(25) NOT NULL,
     "email" VARCHAR(50) NOT NULL,
@@ -15,24 +15,27 @@ ALTER TABLE
     "user" ADD PRIMARY KEY("user_id");
 ALTER TABLE
     "user" ADD CONSTRAINT "user_email_unique" UNIQUE("email");
+CREATE TABLE "check"(
+    "song_id" BIGINT NOT NULL,
+    "lyric_check" BOOLEAN NOT NULL DEFAULT '0',
+    "tab_check" BOOLEAN NOT NULL DEFAULT '0',
+    "mp3_check" BOOLEAN NOT NULL DEFAULT '0',
+    "karaoke_check" BOOLEAN NOT NULL DEFAULT '0'
+);
+ALTER TABLE
+    "check" ADD PRIMARY KEY("song_id");
 CREATE TABLE "search"(
-    "search_id" SERIAL NOT NULL,
+    "search_id" bigserial NOT NULL,
     "search_term" VARCHAR(50) NOT NULL
 );
 ALTER TABLE
     "search" ADD PRIMARY KEY("search_id");
 CREATE TABLE "song"(
-    "song_id" SERIAL NOT NULL,
+    "song_id" bigserial NOT NULL,
     "title" VARCHAR(50) NOT NULL,
-    "lyric_url" VARCHAR(255) NOT NULL,
-    "tab_url" VARCHAR(255) NOT NULL,
-    "mp3_url" VARCHAR(255) NOT NULL,
-    "karaoke_url" VARCHAR(255) NOT NULL,
-    "search_id" INTEGER NOT NULL,
-    "lyric_check" BOOLEAN NOT NULL DEFAULT '0',
-    "tab_check" BOOLEAN NOT NULL DEFAULT '0',
-    "mp3_check" BOOLEAN NOT NULL DEFAULT '0',
-    "karaoke_check" BOOLEAN NOT NULL DEFAULT '0'
+    "artist" VARCHAR(50) NOT NULL,
+    "year" VARCHAR(25) NOT NULL,
+    "album" VARCHAR(50) NOT NULL
 );
 ALTER TABLE
     "song" ADD PRIMARY KEY("song_id");
@@ -44,13 +47,24 @@ CREATE TABLE "user_song"(
 );
 ALTER TABLE
     "user_song" ADD PRIMARY KEY("user_id", "song_id");
+CREATE TABLE "url"(
+    "song_id" BIGINT NOT NULL,
+    "lyric_url" VARCHAR(255) NOT NULL,
+    "tab_url" VARCHAR(255) NOT NULL,
+    "mp3_url" VARCHAR(255) NOT NULL,
+    "karaoke_url" VARCHAR(255) NOT NULL
+);
+ALTER TABLE
+    "url" ADD PRIMARY KEY("song_id");
 ALTER TABLE
     "song_search" ADD CONSTRAINT "song_search_song_id_foreign" FOREIGN KEY("song_id") REFERENCES "song"("song_id");
 ALTER TABLE
-    "song_search" ADD CONSTRAINT "song_search_search_id_foreign" FOREIGN KEY("search_id") REFERENCES "search"("search_id");
+    "url" ADD CONSTRAINT "url_song_id_foreign" FOREIGN KEY("song_id") REFERENCES "song"("song_id");
 ALTER TABLE
-    "song" ADD CONSTRAINT "song_search_id_foreign" FOREIGN KEY("search_id") REFERENCES "song_search"("search_id");
+    "check" ADD CONSTRAINT "check_song_id_foreign" FOREIGN KEY("song_id") REFERENCES "song"("song_id");
 ALTER TABLE
     "user_song" ADD CONSTRAINT "user_song_song_id_foreign" FOREIGN KEY("song_id") REFERENCES "song"("song_id");
+ALTER TABLE
+    "song_search" ADD CONSTRAINT "song_search_search_id_foreign" FOREIGN KEY("search_id") REFERENCES "search"("search_id");
 ALTER TABLE
     "user_song" ADD CONSTRAINT "user_song_user_id_foreign" FOREIGN KEY("user_id") REFERENCES "user"("user_id");

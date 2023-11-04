@@ -13,42 +13,67 @@
             <a href="{{ url_for('library') }}">Library</a>
         </div>
         <div class="hero-text-container">
-            <h1>{{ title }}</h1>
-            <h2>{{ artist }}</h2>
+            <h1>{{ info.title }}</h1>
+            <div class="infoBackground">
+                <h2>{{ info.artist }}</h2>
+                <h3>Album: {{ info.album }} - {{ info.release_year }}</h3>
+            </div>
         </div>
         <div class="hero-img-container">
-            <img src="{{ img_url }}" alt="picture of song and or songs artist">
+            <img src="{{ info.img_url }}" alt="picture of song and or songs artist">
         </div>
     </div>
     <div class="music-player">
         <div class="mp3-container">
-            {% if mp3_path %}
+            {% if info.mp3_check and info.mp3_url%}
                 <h3>MP3</h3>
-                <audio controls src="{{ mp3_path }}"></audio>
+                <audio controls src="../static/mp3/wonderwall.mp3"></audio>
+            {% elif info.mp3_check %}
+                <h3>No MP3 Found</h3>
+            {% else %}
+                <h3>Get MP3</h3>
             {% endif %}    
         </div>
         <div class="karaoke-container">
-            {% if karaoke_path %}  
+            {% if info.karaoke_check and info.karaoke_url %}  
                 <h3>Karaoke</h3>
-                <audio controls src="{{ karaoke_path }}"></audio>
+                <audio controls src="{{ info.karaoke_url }}"></audio>
+            {% elif info.karaoke_check %}
+                <h3>NO Karaoke Found</h3>
             {% else %}
                 <h3>Get Karaoke</h3>
                 <a href="{{ url_for('get_karaoke', song=song) }}">Click Here</a>
             {% endif %}
         </div>
     </div>
-    {% if lyrics %}
-    <div class="lyrics-container">
-        <p>
-            {% for lyric in lyrics %}
-                {{ lyric }}<br>
-            {% endfor %}
-        </p>
-    </div>
+    {% if info.lyric_check and lyrics %}
+        <div class="lyrics-container">
+            <p>
+                {% for lyric in lyrics %}
+                    {{ lyric }}<br>
+                {% endfor %}
+            </p>
+        </div>
+    {% elif info.lyric_check %}
+        <div class="lyrics-container">
+            <h3 class="textCenter">No Lyrics Found</h3>
+        </div>
+    {% else %}
+        <div class="lyrics-container">
+            <h3 class="textCenter">GET Lyrics</h3>
+        </div>
     {% endif %}
-    {% if pdf_path %}
+    {% if info.tab_check and info.tab_url %}
         <div class="pdf-container">
-            <embed src="{{ pdf_path }}" type="application/pdf" width="95%" height="2000px" />
+            <embed src="{{ info.tab_url }}" type="application/pdf" width="95%" height="2000px" />
+        </div>
+    {% elif info.tab_check %}
+        <div class="lyrics-container">
+            <h3 class="textCenter">No Tabs Found</h3>
+        </div>
+    {% else %}
+        <div class="lyrics-container">
+            <h3 class="textCenter">GET Tabs</h3>
         </div>
     {% endif %}
     <div class="footer">
