@@ -1,2 +1,6 @@
 ../myenv/
 ./.env/
+./static/karaoke
+./static/lyric
+./static/mp3
+./static/tab
