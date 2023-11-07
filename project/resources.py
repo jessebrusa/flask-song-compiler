@@ -8,62 +8,68 @@ import glob
 import shutil
 
 
-def obtain_lyrics_create_dir(input_title, GOOGLE_API_KEY, GOOGLE_CX):
-    path = "./static/music/"
+def obtain_lyrics_get_img(GOOGLE_API_KEY, GOOGLE_CX, title, **kwargs):
+    artist = kwargs.get('artist')
+    path = "./static/lyric/"
     API = azapi.AZlyrics('google', accuracy=0.5)
-    API.title = input_title
+    API.title = title
+    if artist:
+        API.artist = artist
+    
 
-    API.getLyrics()
+    API.getLyrics(save=True, path=path)
 
-    # Come back to make file exist error catch and route to song-page
-    os.mkdir(f'{path}{API.title.lower()}')
-    API.getLyrics(save=True, path=f'{path}{API.title.lower()}')
-    os.rename(f'{path}{API.title.lower()}/{API.title} - {API.artist}.txt', 
-              f'{path}{API.title.lower()}/{API.title.lower()} - {API.artist.lower()}.txt')
+    os.rename(f'{path}/{API.title} - {API.artist}.txt', 
+              f'{path}/{API.title}.txt')
 
     img_url = get_google_img(f'{API.title} {API.artist}', GOOGLE_API_KEY, GOOGLE_CX)
 
-    with open(f'{path}{API.title.lower()}/info.txt', 'w') as file:
-        file.write(f'{API.title}\n{API.artist}\n{img_url}')
-
-    return [API.title, API.artist]
+    return [API.title, API.artist, img_url]
 
 
-def download_song(song_title, song_artist, path):
-    query = f"{song_title} {song_artist} audio"
-    videos_search = VideosSearch(query, limit=1)
-    video_url = videos_search.result()['result'][0]['link']
-    
-    os.environ['SSL_CERT_FILE'] = certifi.where()
-
-    youtube = YouTube(video_url)
-    audio_stream = youtube.streams.filter(only_audio=True).first()
-    audio_stream.download(output_path=path, filename=f'{song_title.lower()}.mp3')
-
-
-def search_song_karaoke(song):
-    song_info = []
-    with open(f"./static/music/{song.lower()}/info.txt", "r") as file:
-        song_info.append(file.read().splitlines())
-
-    title = song_info[0][0]
-    artist = song_info[0][1]
-    path = f'./static/music/{song}/'
-
+def download_song(title, artist, path):
+    query = f"{title} {artist} audio"
     try:
-        download_song(f"{title.lower()} karaoke", artist.lower(), path)
+        videos_search = VideosSearch(query, limit=1)
+        video_url = videos_search.result()['result'][0]['link']
         
-    except FileExistsError:
-        print('No Karaoke File Found')
+        os.environ['SSL_CERT_FILE'] = certifi.where()
+
+        youtube = YouTube(video_url)
+        audio_stream = youtube.streams.filter(only_audio=True).first()
+        audio_stream.download(output_path=path, filename=f'{title}.mp3')
+
+        return True
+    
+    except:
+        return False
 
 
-def move_from_downloads(destination_folder):
+def download_karaoke(title, path):
+    query = f"{title} Karaoke"
+    try:
+        videos_search = VideosSearch(query, limit=1)
+        video_url = videos_search.result()['result'][0]['link']
+        
+        os.environ['SSL_CERT_FILE'] = certifi.where()
+
+        youtube = YouTube(video_url)
+        audio_stream = youtube.streams.filter(only_audio=True).first()
+        audio_stream.download(output_path=path, filename=f'{title}_karaoke.mp3')
+
+        return True
+    
+    except:
+        return False
+
+
+def move_from_downloads(destination_folder, new_filename):
     downloads_folder = '/Users/jessebrusa/Downloads'
     files = glob.glob(os.path.join(downloads_folder, '*'))
     sorted_files = sorted(files, key=os.path.getmtime, reverse=True)
     most_recent_file = sorted_files[0]
 
-    destination_path = os.path.join(destination_folder, os.path.basename(most_recent_file))
+    destination_path = os.path.join(destination_folder, new_filename)
     shutil.move(most_recent_file, destination_path)
 
 
@@ -84,3 +90,18 @@ def get_google_img(query, api_key, cx):
         return img_url
 
     return None
+
+
+def get_album_release_year(API_KEY, title, artist):
+    url = f'http://ws.audioscrobbler.com/2.0/?method=track.getInfo&api_key={API_KEY}&artist={artist}&track={title}&format=json'
+    response = requests.get(url)
+
+    if response.status_code == 200:
+        data = response.json()
+        track_info = data.get('track', {})
+        if 'album' in track_info:
+            album_info = track_info['album']
+            release_year = album_info.get('releasedate')
+            album_name = album_info.get('title')
+
+            return [album_name, release_year]

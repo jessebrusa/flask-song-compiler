@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='../static/css/stylesheet.css') }}">
-    <title>{{ title }}</title>
+    <title>{{ info.title }}</title>
 </head>
 <body class="song-page-body">
     <div class="hero-container">
@@ -16,7 +16,13 @@
             <h1>{{ info.title }}</h1>
             <div class="infoBackground">
                 <h2>{{ info.artist }}</h2>
-                <h3>Album: {{ info.album }} - {{ info.release_year }}</h3>
+                {% if info.album and info.release_year %}
+                    <h3>Album: {{ info.album }} - {{ info.release_year }}</h3>
+                {% elif info.album %}
+                    <h3>Album: {{ info.album }}</h3>
+                {% elif info.release_year %}
+                    <h3>Release Year: {{ info.release_year }}</h3>
+                {% endif %}
             </div>
         </div>
         <div class="hero-img-container">
@@ -31,7 +37,9 @@
             {% elif info.mp3_check %}
                 <h3>No MP3 Found</h3>
             {% else %}
-                <h3>Get MP3</h3>
+                <a href="{{ url_for('get_mp3', song_id=info.song_id) }}" class="getData">
+                    <h3>Get MP3</h3>
+                </a>
             {% endif %}    
         </div>
         <div class="karaoke-container">
@@ -41,8 +49,9 @@
             {% elif info.karaoke_check %}
                 <h3>NO Karaoke Found</h3>
             {% else %}
-                <h3>Get Karaoke</h3>
-                <a href="{{ url_for('get_karaoke', song=song) }}">Click Here</a>
+                <a href="{{ url_for('get_karaoke', song_id=info.song_id) }}" class="getData">
+                    <h3>Get Karaoke</h3>
+                </a>
             {% endif %}
         </div>
     </div>
@@ -58,10 +67,6 @@
         <div class="lyrics-container">
             <h3 class="textCenter">No Lyrics Found</h3>
         </div>
-    {% else %}
-        <div class="lyrics-container">
-            <h3 class="textCenter">GET Lyrics</h3>
-        </div>
     {% endif %}
     {% if info.tab_check and info.tab_url %}
         <div class="pdf-container">
@@ -72,14 +77,12 @@
             <h3 class="textCenter">No Tabs Found</h3>
         </div>
     {% else %}
-        <div class="lyrics-container">
-            <h3 class="textCenter">GET Tabs</h3>
-        </div>
+        <a href="{{ url_for('get_tab', song_id=info.song_id) }}" class="getData getTab">
+            <div class="lyrics-container expandContract">
+                <h3 class="textCenter">GET Tabs</h3>
+            </div>    
+        </a>
     {% endif %}
-    <div class="footer">
-        <p>Webpage by: Jesse Brusa</p>
-        <p>Song Compiler</p>
-        <p>© Copyright 2023</p>
-    </div>  
+    {% include 'footer.html' %}
 </body>
 </html>
