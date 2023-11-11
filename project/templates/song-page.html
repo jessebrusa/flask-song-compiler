@@ -17,9 +17,10 @@
             <div class="infoBackground">
                 <h2>{{ info.artist }}</h2>
                 {% if info.album and info.release_year %}
-                    <h3>Album: {{ info.album }} - {{ info.release_year }}</h3>
+                    <h3>Album Title: {{ info.album }}</h3>
+                    <h3>Album Release Year: {{ info.release_year }}</h3>
                 {% elif info.album %}
-                    <h3>Album: {{ info.album }}</h3>
+                    <h3>Album Title: {{ info.album }}</h3>
                 {% elif info.release_year %}
                     <h3>Release Year: {{ info.release_year }}</h3>
                 {% endif %}
@@ -33,7 +34,7 @@
         <div class="mp3-container">
             {% if info.mp3_check and info.mp3_url%}
                 <h3>MP3</h3>
-                <audio controls src="../static/mp3/wonderwall.mp3"></audio>
+                <audio controls src="{{ info.mp3_url }}"></audio>
             {% elif info.mp3_check %}
                 <h3>No MP3 Found</h3>
             {% else %}
@@ -69,8 +70,14 @@
         </div>
     {% endif %}
     {% if info.tab_check and info.tab_url %}
-        <div class="pdf-container">
+        <!-- <div class="pdf-container">
             <embed src="{{ info.tab_url }}" type="application/pdf" width="95%" height="2000px" />
+        </div> -->
+        <div class="pdf-container">
+            <object data="{{ info.tab_url }}" type="application/pdf" width="100%" height="1200px">
+                <p>It appears you don't have a PDF plugin for this browser.
+                   You can <a href="{{ info.tab_url }}">download the PDF file.</a></p>
+            </object>
         </div>
     {% elif info.tab_check %}
         <div class="lyrics-container">
@@ -83,6 +90,9 @@
             </div>    
         </a>
     {% endif %}
+    <a href="{{ url_for('delete_song_page', song_id=info.song_id) }}">
+        DELETE BUTTON
+    </a>
     {% include 'footer.html' %}
 </body>
 </html>

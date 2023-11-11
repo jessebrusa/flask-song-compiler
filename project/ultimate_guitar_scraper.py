@@ -15,11 +15,14 @@ class UltimateGuitarScraper:
         async with async_playwright() as p:
             browser = await p.chromium.launch()
             page = await browser.new_page()
-            await page.goto(self.url, wait_until='domcontentloaded')
-            
-            await page.wait_for_selector('div.djFV9')
+            try:
+                await page.goto(self.url, wait_until='domcontentloaded')
+                
+                await page.wait_for_selector('div.djFV9', timeout=5)
 
-            html = await page.content()
+                html = await page.content()
+            except asyncio.TimeoutError:
+                return None
 
             with open('scrape-for-link.html', 'w', encoding='utf-8') as file:
                 file.write(html)
@@ -50,7 +53,7 @@ class UltimateGuitarScraper:
             return href_value
 
 
-    async def login_download_pdf(self, href):
+    async def download_pdf(self, href):
         async with async_playwright() as p:
             current_directory = os.getcwd()
             download_path = os.path.join(current_directory, 'static/tab/')
@@ -77,4 +80,4 @@ class UltimateGuitarScraper:
     
 
     def run_downloader(self, href):
-        return asyncio.run(self.login_download_pdf(href))
+        return asyncio.run(self.download_pdf(href))

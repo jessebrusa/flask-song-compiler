@@ -178,6 +178,7 @@ h1 {
 .music-card img {
     width: 200px;
     height: auto;
+    max-height: 200px;
 }
 
 .img-container-library {
@@ -209,6 +210,7 @@ h1 {
     box-sizing: border-box;
     background-color: #9d9394;
     border-radius: 25px;
+    padding: 15px;
 }
 
 
@@ -429,6 +431,14 @@ label {
     font-size: 50px;
 }
 
+.searchSubmit:hover {
+    transform: scale(1.2);
+}
+
+.searchSubmit:active {
+    transform: scale(.85);
+}
+
 .rowItems {
     width: 100%;
     display: flex;
@@ -448,6 +458,7 @@ label {
     scale: 2;
     font-size: 50px;
 }
+
 
 @media screen and (max-width: 1500px) {
     .hero-container {

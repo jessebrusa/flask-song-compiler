@@ -6,25 +6,23 @@ import requests
 import azapi
 import glob
 import shutil
+import lyricsgenius
+import re
+import subprocess
 
 
-def obtain_lyrics_get_img(GOOGLE_API_KEY, GOOGLE_CX, title, **kwargs):
+def obtain_lyrics(title, **kwargs):
     artist = kwargs.get('artist')
-    path = "./static/lyric/"
     API = azapi.AZlyrics('google', accuracy=0.5)
     API.title = title
     if artist:
         API.artist = artist
-    
 
-    API.getLyrics(save=True, path=path)
-
-    os.rename(f'{path}/{API.title} - {API.artist}.txt', 
-              f'{path}/{API.title}.txt')
-
-    img_url = get_google_img(f'{API.title} {API.artist}', GOOGLE_API_KEY, GOOGLE_CX)
-
-    return [API.title, API.artist, img_url]
+    API.getLyrics(save=False)
+    if API.lyrics:
+        return API.lyrics
+    else:
+        return None
 
 
 def download_song(title, artist, path):
@@ -83,11 +81,13 @@ def get_google_img(query, api_key, cx):
     }
 
     response = requests.get(url, params=params)
-    data = response.json()
 
-    if "items" in data and len(data["items"]) > 0:
-        img_url = data["items"][0]["link"]
-        return img_url
+    if response.status_code == 200:
+        data = response.json()
+
+        if "items" in data and len(data["items"]) > 0:
+            img_url = data["items"][0]["link"]
+            return img_url
 
     return None
 
@@ -105,3 +105,89 @@ def get_album_release_year(API_KEY, title, artist):
             album_name = album_info.get('title')
 
             return [album_name, release_year]
+        
+
+def get_song_info(title, **kwargs):
+    artist = kwargs.get('artist')
+    if artist:
+        search_query = f'{title} by {artist}'
+    else: 
+        search_query = title
+
+    base_url = 'https://musicbrainz.org/ws/2/'
+
+    params = {
+            'query': search_query,
+            'fmt': 'json',
+            'limit': 1,
+            'client': 'flask-song-compiler',
+            'inc': 'artist-credits+releases',
+            'fmt': 'json'
+        }
+    
+    response = requests.get(f'{base_url}recording', params=params)
+
+    if response.status_code == 200:
+        data = response.json()
+        if 'recordings' in data and len(data['recordings']) > 0:
+            recording = data['recordings'][0]
+            title = recording['title']
+            artist = recording['artist-credit'][0]['artist']['name']
+            if 'releases' in recording:
+                release = recording['releases'][0]
+                album = release['title']
+                release_year = release['date'] if 'date' in release else 'Unknown Year'
+                print(f"Title: {title}, Artist: {artist}, Album: {album}, Release Year: {release_year}")
+                return [album, release_year]
+            else:
+                print(f"Title: {title}, Artist: {artist}, No album information found.")
+                return ['Unknown Album', 'Unknown Year']
+        else:
+            print("No matching song found.")
+            return ['Unknown Album', 'Unknown Year']
+    else:
+        print("Error: Unable to access the MusicBrainz API.")
+        return ['Unknown Album', 'Unknown Year']
+    
+
+def clean_lyrics(lyrics):
+    # Define a list of common metadata patterns to remove
+    metadata_patterns = [
+        r"\[.*?\]",  # Matches content within square brackets, e.g., [Verse 1]
+        r"\(.*?\)",  # Matches content within parentheses, e.g., (Intro)
+        r"\d+\s*Contributors",  # Matches numeric value followed by "Contributors"
+        r"[\w\s]+ Lyrics",  # Matches "Artist Name Lyrics"
+    ]
+
+    # Define a list of specific patterns to exclude
+    exclude_patterns = [
+        r"\d+Embed",  # Exclude numeric value followed by "Embed"
+    ]
+
+    # Combine the metadata and exclude patterns into a regular expression
+    all_patterns = metadata_patterns + exclude_patterns
+    all_regex = "|".join(all_patterns)
+
+    # Remove metadata and exclude patterns from the beginning and end of the lyrics
+    cleaned_lyrics = re.sub(f".*?{all_regex}|{all_regex}.*?$", "", lyrics)
+
+    return cleaned_lyrics.strip()
+
+
+def get_lyrics(api_key, title, **kwargs):
+    artist = kwargs.get('artist')
+
+    genius = lyricsgenius.Genius(api_key)
+
+    if artist:
+        song = genius.search_song(title, artist)
+    else:
+        song = genius.search_song(title)
+
+    if song:
+        lyrics = clean_lyrics(song.lyrics)
+
+        return lyrics
+    else:
+        return None
+    

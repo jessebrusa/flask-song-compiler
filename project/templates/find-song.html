@@ -12,7 +12,7 @@
         <h1>Find A Song</h1>
         <div class="temp-search"></div>
     </div>
-    <form method="POST" action="/find-song">
+    <form method="POST" action="/find-song" id="myForm">
         <div class="rowItems">
             <label for="title-name">Song Title: </label>
             <input name="title" type="text" class="searchInput" required>
@@ -42,7 +42,7 @@
                 No:<input name="tabYesNo" type="radio" value="no" class="radio">
             </div>
         </div>
-        <input name="submit" type="submit" class="searchSubmit">
+        <input name="submit" type="submit" class="searchSubmit" id="loadButton">
     </form>
     {% include 'footer.html' %}
 </body>
