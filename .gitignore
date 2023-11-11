@@ -1,5 +1,5 @@
 myenv/
-project/.env/
+project/.env
 project/static/karaoke/
 project/static/lyric/
 project/static/mp3/
