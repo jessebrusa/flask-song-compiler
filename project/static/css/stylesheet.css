@@ -459,6 +459,21 @@ label {
     font-size: 50px;
 }
 
+#loading {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.loadingInfo {
+    color: white;
+    font-size: 80px;
+}
+
+.loadingGif {
+    scale: 4;
+}
 
 @media screen and (max-width: 1500px) {
     .hero-container {

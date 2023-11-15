@@ -170,3 +170,67 @@ def get_pdf(song_id):
             SELECT tab_url FROM url
             WHERE song_id = {song_id}
             '''
+
+
+def get_search_id(search_term):
+    if "'" in search_term:
+        search_term = search_term.replace("'", "''")
+    return f'''
+            SELECT search_id FROM searches
+            WHERE search_term = '{search_term}'
+            '''
+
+
+def insert_new_search(search_term):
+    if "'" in search_term:
+        search_term = search_term.replace("'", "''")
+    return f'''
+            INSERT INTO searches(search_term)
+            VALUES(
+                '{search_term}'
+            )
+            '''
+
+
+def insert_song_search(song_id, search_id):
+    return f'''
+            INSERT INTO song_search(song_id, search_id)
+            VALUES(
+                {song_id},
+                {search_id}
+            )
+            '''
+
+
+def insert_new_user(f_name, l_name, email, password):
+    if "'" in f_name:
+        f_name = f_name.replace("'", "''")
+    if "'" in l_name:
+        l_name = l_name.replace("'", "''")
+    if "'" in email:
+        email = email.replace("'", "''")
+    if "'" in password:
+        password = password.replace("'", "''")
+
+    return f'''
+            INSERT INTO users(first_name, last_name, email, password)
+            VALUES(
+                '{f_name}',
+                '{l_name}',
+                '{email}',
+                '{password}'
+            )
+            '''
+
+def get_user(email):
+    if "'" in email:
+        email = email.replace("'", "''")
+
+    return f'''
+            SELECT user_id, email, password FROM users
+            WHERE email = '{email}'
+            '''
+
+
+
+user_table = ['user_id', 'email', 'password']

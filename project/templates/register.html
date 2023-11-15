@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/css/stylesheet.css">
+    <title>Register</title>
+</head>
+<body class="find-song-body">
+    <form action="{{ url_for('register_page') }}" method="POST">
+        <div class="rowItems">
+            <label for="title-name">First Name: </label>
+            <input name="f_name" type="text" class="searchInput" required>
+        </div>
+        <div class="rowItems">
+            <label for="title-name">Last Name: </label>
+            <input name="l_name" type="text" class="searchInput" required>
+        </div>
+        <div class="rowItems">
+            <label for="title-name">Email: </label>
+            <input name="email" type="email" class="searchInput" required>
+        </div>
+        <div class="rowItems">
+            <label for="title-name">Password: </label>
+            <input name="password" type="text" class="searchInput" required>
+        </div>
+        <input type="submit">
+    </form>
+    {% include 'footer.html' %}
+</body>
+</html>

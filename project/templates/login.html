@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/css/stylesheet.css">
+    <title>Login</title>
+</head>
+<body class="find-song-body">
+    <form action="{{ url_for('login_page') }}" method="POST">
+        <div class="rowItems">
+            <label for="title-name">Email: </label>
+            <input name="email" type="email" class="searchInput" required>
+        </div>
+        <div class="rowItems">
+            <label for="title-name">Password: </label>
+            <input name="password" type="password" class="searchInput" required>
+        </div>
+        <input type="submit">
+        {% if email_not_exist %}
+            <h3>Email not found.....</h3>
+        {% elif password_not_true %}
+            <h3>Password incorrect</h3>
+        {% endif %}
+    </form>
+    {% include 'footer.html' %}
+</body>
+</html>

@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='../static/css/stylesheet.css') }}">
+    <!-- Add this to your HTML file -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <title>Find A Song</title>
 </head>
 <body class="find-song-body">
@@ -12,7 +14,7 @@
         <h1>Find A Song</h1>
         <div class="temp-search"></div>
     </div>
-    <form method="POST" action="/find-song" id="myForm">
+    <form method="POST" action="{{ url_for('find_song') }}" id="myForm">
         <div class="rowItems">
             <label for="title-name">Song Title: </label>
             <input name="title" type="text" class="searchInput" required>
@@ -44,6 +46,46 @@
         </div>
         <input name="submit" type="submit" class="searchSubmit" id="loadButton">
     </form>
+    <div id="loading" style="display: none;">
+        <p class="loadingInfo">Loading...</p>
+        <img src="../static/img/Bouncing ball.gif" alt="Loading Spinner" class="loadingGif">
+    </div>
     {% include 'footer.html' %}
+    <script>
+        $(document).ready(function () {
+            $("#myForm").submit(function (event) {
+                // Prevent the default form submission
+                event.preventDefault();
+
+                $("#myForm").hide();
+
+                // Show the loading message
+                $("#loading").show();
+    
+                // Serialize the form data
+                var formData = $(this).serialize();
+    
+                // Use AJAX to submit the form data
+                $.ajax({
+                    type: "POST",
+                    url: $(this).attr("action"),
+                    data: formData,
+                    success: function (response) {
+                        // Handle the response if needed
+    
+                        // Hide the loading message
+                        $("#loading").hide();
+                        window.location.href = response.redirect;
+                    },
+                    error: function (error) {
+                        // Handle the error if needed
+    
+                        // Hide the loading message
+                        $("#loading").hide();
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>
