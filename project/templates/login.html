@@ -7,7 +7,7 @@
     <title>Login</title>
 </head>
 <body class="find-song-body">
-    <form action="{{ url_for('login_page') }}" method="POST">
+    <form action="{{ url_for('login_page') }}" method="POST" class="registerLogin">
         <div class="rowItems">
             <label for="title-name">Email: </label>
             <input name="email" type="email" class="searchInput" required>
@@ -16,7 +16,7 @@
             <label for="title-name">Password: </label>
             <input name="password" type="password" class="searchInput" required>
         </div>
-        <input type="submit">
+        <input type="submit" class="submitButton">
         {% if email_not_exist %}
             <h3>Email not found.....</h3>
         {% elif password_not_true %}

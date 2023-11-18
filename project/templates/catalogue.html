@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='../static/css/stylesheet.css') }}">
+    <title>Music Catalogue</title>
+</head>
+<body class="library-body">
+    {% include 'header.html' %}
+    <h1 class="libraryHeader">Music Catalogue</h1>
+        <div class="music-card-container">
+            {% for song in songs %}
+                <div class="musicCardAdd">
+                    <a href="{{ url_for('song_page', song_id=song.song_id) }}">
+                        <div class="music-card">
+                            <h2>{{ song.title }}</h2>
+                            <h3>{{ song.artist }}</h3>
+                            <div class="img-container-library">
+                                <img src="{{ song.img_url }}" alt="picture of song and or songs artist">
+                            </div>
+                        </div>
+                    </a> 
+                    {% if current_user.is_authenticated %}
+                        <a href="{{ url_for('connect_song', song_id=song.song_id) }}" class="addLink">Add To Your Library</a>
+                    {% endif %}    
+                </div>          
+            {% endfor %}
+        </div>
+    </div>
+    {% include 'footer.html' %}  
+</body>
+</html>

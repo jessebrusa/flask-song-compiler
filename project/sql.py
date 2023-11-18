@@ -1,7 +1,19 @@
 library_table = ['song_id', 'title', 'artist', 'img_url']
 
 
-def library_songs():
+def library_songs(user_id):
+    return f'''SELECT 
+                    song.song_id, 
+                    title, artist, 
+                    url.img_url 
+                FROM song
+                INNER JOIN url ON song.song_id = url.song_id
+                INNER JOIN user_song on user_song.song_id = song.song_id
+                WHERE user_song.user_id = {user_id}
+                ORDER BY title;'''
+
+
+def catalogue_songs():
     return '''SELECT 
                     song.song_id, 
                     title, artist, 
@@ -9,7 +21,6 @@ def library_songs():
                 FROM song
                 INNER JOIN url ON song.song_id = url.song_id
                 ORDER BY title;'''
-
 
 song_page_table = ['song_id', 'title', 'artist',
                    'lyric_check', 'tab_check', 'mp3_check', 'karaoke_check',
@@ -220,21 +231,24 @@ def insert_song_search(song_id, search_id):
             '''
 
 
-def insert_new_user(f_name, l_name, email, password):
+def insert_new_user(f_name, l_name, username, email, password):
     if "'" in f_name:
         f_name = f_name.replace("'", "''")
     if "'" in l_name:
         l_name = l_name.replace("'", "''")
+    if "'" in username:
+        username = username.replace("'", "''")
     if "'" in email:
         email = email.replace("'", "''")
     if "'" in password:
         password = password.replace("'", "''")
 
     return f'''
-            INSERT INTO users(first_name, last_name, email, password)
+            INSERT INTO users(first_name, last_name, username, email, password)
             VALUES(
                 '{f_name}',
                 '{l_name}',
+                '{username}',
                 '{email}',
                 '{password}'
             )
@@ -245,10 +259,21 @@ def get_user(email):
         email = email.replace("'", "''")
 
     return f'''
-            SELECT user_id, email, password FROM users
+            SELECT user_id, first_name, last_name, email, password, username FROM users
             WHERE email = '{email}'
             '''
 
 
 
 user_table = ['user_id', 'email', 'password']
+
+
+
+def insert_user_song(user_id, song_id):
+    return f'''
+            INSERT INTO user_song(user_id, song_id)
+            VALUES(
+                {user_id},
+                {song_id}
+            )
+            '''

@@ -43,8 +43,11 @@ app.config['SECRET_KEY'] = 'la;sdjfaowiherojiqwke208935uijrklnwfd80ujioo23'
 login_manager = LoginManager(app)
 
 class User(UserMixin):
-    def __init__(self, user_id, email):
+    def __init__(self, user_id, first_name, last_name, username, email):
         self.id = user_id
+        self.first_name = first_name
+        self.last_name = last_name
+        self.username = username
         self.email = email
 
 
@@ -56,7 +59,7 @@ def load_user(user_id):
             user_data = cursor.fetchone()
 
             if user_data:
-                user = User(user_data[0], user_data[1])
+                user = User(user_data[0], user_data[1], user_data[2], user_data[5], user_data[3])
                 return user
             else:
                 return None
@@ -77,22 +80,56 @@ def logged_in_only(f):
 
 @app.route('/')
 def home_page():
+    if current_user.is_authenticated:
+        return redirect(url_for('dashboard'))
+
     return render_template('index.html')
 
 
 @app.route('/library')
 def library():
-    conn = pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port='5433')
-    cur = conn.cursor()
+    user_id = current_user.id
 
-    songs_sql = library_songs()
-    Song = namedtuple('Song', library_table)
-    cur.execute(songs_sql)
-    songs = [Song(*row) for row in cur.fetchall()]
+    with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port='5433') as conn:
+        with conn.cursor() as cur:
+            songs_sql = library_songs(user_id)
+            Song = namedtuple('Song', library_table)
+            cur.execute(songs_sql)
+            songs = [Song(*row) for row in cur.fetchall()]
 
-    conn.close()
 
     return render_template('library.html', songs=songs)
+
+
+@app.route('/catalogue')
+def catalogue():
+    with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port='5433') as conn:
+        with conn.cursor() as cur:
+            songs_sql = catalogue_songs()
+            Song = namedtuple('Song', library_table)
+            cur.execute(songs_sql)
+            songs = [Song(*row) for row in cur.fetchall()]
+
+    return render_template('catalogue.html', songs=songs)
+
+
+@app.route('/dashboard')
+def dashboard():
+    return render_template('dashboard.html')
+
+
+@app.route('/connect-song/<int:song_id>')
+def connect_song(song_id):
+    user_id = current_user.id
+    
+    with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port='5433') as conn:
+        with conn.cursor() as cur:
+            cur.execute(insert_user_song(user_id, song_id))
+            conn.commit()
+
+
+    return redirect(url_for('song_page', song_id=song_id))
+
 
 
 @app.route('/song-page/<int:song_id>')
@@ -189,7 +226,6 @@ def get_tab(song_id):
 @logged_in_only
 def find_song():
     if request.method == 'POST':
-        print('it made post')
         conn = pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port='5433')
         cur = conn.cursor()
 
@@ -198,6 +234,8 @@ def find_song():
         input_mp3 = request.form.get('mp3YesNo')
         input_karaoke = request.form.get('karaokeYesNo')
         input_tab = request.form.get('tabYesNo')
+
+        user_id = current_user.id
 #########################################################################################################
         compare_searches_query = query_search_terms(input_title)
         cur.execute(compare_searches_query)
@@ -205,16 +243,17 @@ def find_song():
 #########################################################################################################
 
         if compare_searches_song_id:
-            print(compare_searches_song_id[0])
             song_id = compare_searches_song_id[0]
-            print('caught before search')
-            #Connect User to song
+
+            with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port='5433') as conn:
+                with conn.cursor() as cur:
+                    cur.execute(insert_user_song(user_id, song_id))
+                    conn.commit()
 
             redirect_url = url_for('song_page', song_id=song_id)
             return jsonify({'redirect': redirect_url})
 
 
-            # return redirect(url_for('song_page', song_id=song_id))
 
 #########################################################################################################
         
@@ -230,12 +269,12 @@ def find_song():
             except:
                 redirect_url = url_for('song_not_found')
                 return jsonify({'redirect': redirect_url})
-                # return render_template('song-not-found.html')
+   
 #########################################################################################################
             if title is None:
                 redirect_url = url_for('song_not_found')
                 return jsonify({'redirect': redirect_url})
-                # return render_template('song-not-found.html')
+
 #########################################################################################################      
       
             compare_searches_query = query_search_terms(title)
@@ -244,16 +283,20 @@ def find_song():
 
  #########################################################################################################           
             if compare_searches_song_id:
-                print('Correct title does match a search')
                 new_search_term_sql = update_value(song_id, 'searches', 'search_term', input_title)
                 cur.execute(new_search_term_sql)
                 conn.commit()
                 #Connect User to song
 
+                with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port='5433') as conn:
+                    with conn.cursor() as cur:
+                        cur.execute(insert_user_song(user_id, song_id))
+                        conn.commit()
+
                 redirect_url = url_for('song_page', song_id=song_id)
                 return jsonify({'redirect': redirect_url})
 
-                # return redirect(url_for('song_page', song_id=song_id))
+
 #########################################################################################################
             sql_new_song = insert_new_song(title, artist)
             cur.execute(sql_new_song)
@@ -262,6 +305,9 @@ def find_song():
             song_id_sql = get_song_id(title)
             cur.execute(song_id_sql)
             song_id = cur.fetchone()[0]
+
+            cur.execute(insert_user_song(user_id, song_id))
+            conn.commit()
 
             new_search_term_input_sql = insert_new_search(input_title)
             cur.execute(new_search_term_input_sql)
@@ -338,8 +384,6 @@ def find_song():
                 conn.commit()
 #########################################################################################################
 
-
-            print('beginning gather main')
             asyncio.run(gather_main(song_id, input_mp3, input_karaoke, input_tab,
                                     title, artist, 
                                     cur, conn))
@@ -392,12 +436,13 @@ def register_page():
 
         f_name = request.form.get('f_name')
         l_name = request.form.get('l_name')
+        username = request.form.get('username')
         email = request.form.get('email')
         password = request.form.get('password')
 
         pass_hash = generate_password_hash(password)
 
-        new_user_sql = insert_new_user(f_name, l_name, email, pass_hash)
+        new_user_sql = insert_new_user(f_name, l_name, username, email, pass_hash)
         cur.execute(new_user_sql)
         conn.commit()
 
@@ -409,7 +454,13 @@ def register_page():
 
         session['user_id'] = user_id[0]
 
-        return redirect(url_for('library'))
+        user_object = User(user_id, f_name, l_name, 
+                        username, email)
+
+
+        login_user(user_object)
+
+        return redirect(url_for('dashboard'))
     
     return render_template('register.html')
 
@@ -427,27 +478,30 @@ def login_page():
                 cur.execute(get_user(email))
                 user = cur.fetchone()
 
+            print(user)
             if user:
                 user_dict = {
                     'user_id': user[0],
-                    'email': user[1],
-                    'password': user[2]
+                    'first_name': user[1],
+                    'last_name': user[2],
+                    'email': user[3],
+                    'password': user[4],
+                    'username': user[5],
                 }
 
             
             password_true = check_password_hash(user_dict['password'], password_input)
 
             if password_true:
-                print('password is true')
                 session['user_id'] = user_dict['user_id']
-                print('in session')
 
-                user_object = User(user_dict['user_id'], user_dict['email'])
+                user_object = User(user_dict['user_id'], user_dict['first_name'], user_dict['username'],
+                                   user_dict['last_name'], user_dict['email'])
+
 
                 login_user(user_object)
-                print('user logged in')
               
-                return redirect(url_for('library'))
+                return redirect(url_for('dashboard'))
 
 
             else:

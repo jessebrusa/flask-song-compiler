@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='../static/css/stylesheet.css') }}">
+    <title>Music Library</title>
+</head>
+<body class="library-body">
+    {% include 'header.html' %}
+    <h1 class="dashboardHeader">Welcome {{ current_user.username }}</h1>
+    <div class="dashboardBody">
+        <div class="dashboardFavs">
+            <h2>Favorites</h2>
+        </div>
+        <div class="dashboardGroups">
+            <h2>Groups</h2>
+        </div>
+    </div>
+    {% include 'footer.html' %}  
+</body>
+</html>

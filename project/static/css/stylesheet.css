@@ -39,11 +39,12 @@ h1 {
 
 .navBar {
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-around;
     align-items: center;
     gap: 40px;
     margin-top: 20px;
-    width: 80%;
+    width: 90%;
 }
 
 .navBar > a {
@@ -58,8 +59,9 @@ h1 {
     font-family: 'cabin';
     margin-top: 10px;
     margin-bottom: 10px;
-    width: 200px;
+    width: 250px;
     text-align: center;
+    scale: .8;
 }
 
 .navBar > a:hover {
@@ -72,12 +74,31 @@ h1 {
 }
 
 .homePage {
-    width: 30%;
+    width: 40%;
     display: flex;
     flex-wrap: wrap;
     background-color: rgba(157, 147, 148, .7);
     padding: 20px;
     border-radius: 20px;
+}
+
+.registerLogin {
+    margin-top: 75px;
+}
+
+.submitButton {
+    width: 40%;
+    font-size: 45px;
+    padding: 20px;
+    border-radius: 20px;
+}
+
+.submitButton:hover {
+    transform: scale(1.2);
+}
+
+.submitButton:active {
+    transform: scale(.85);
 }
 
 .direction-container > a:hover {
@@ -184,7 +205,7 @@ h1 {
 }
 
 .music-card:hover {
-    transform: scale(1.15);
+    transform: scale(1.1);
 }
 
 .music-card h2 {
@@ -206,6 +227,34 @@ h1 {
     width: 200px;
     height: auto;
     max-height: 200px;
+}
+
+
+.musicCardAdd {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+}
+
+.addLink {
+    text-decoration: none;
+    color: black;
+    background-color: #a0a088;
+    width: 95%;
+    text-align: center;
+    padding: 5px;
+    border-radius: 20px;
+    margin-top: 20px;
+}
+
+.addLink:hover {
+    transform: scale(1.2);
+}
+
+.addLink:active {
+    transform: scale(.85);
 }
 
 .img-container-library {
@@ -501,6 +550,17 @@ label {
 .loadingGif {
     scale: 4;
 }
+
+.dashboardHeader {
+    margin: 10px;
+}
+
+.dashboardBody {
+    width: 90%;
+    display: flex;
+    justify-content: space-around;
+}
+
 
 @media screen and (max-width: 1500px) {
     .hero-container {
