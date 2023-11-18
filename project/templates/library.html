@@ -7,21 +7,19 @@
     <title>Music Library</title>
 </head>
 <body class="library-body">
-    <div class="library-header">
-        <a href="{{ url_for('find_song') }}">Find A Song</a>
-        <h1>Music Library</h1>
-        <div class="temp-search"></div>
-    </div>
-    <div class="music-card-container">
-        {% for song in songs %}
-            <a href="{{ url_for('song_page', song_id=song.song_id) }}"><div class="music-card">
-                <h2>{{ song.title }}</h2>
-                <h3>{{ song.artist }}</h3>
-                <div class="img-container-library">
-                    <img src="{{ song.img_url }}" alt="picture of song and or songs artist">
-                </div>
-            </div></a>
-        {% endfor %}
+    {% include 'header.html' %}
+    <h1 class="libraryHeader">Music Library</h1>
+        <div class="music-card-container">
+            {% for song in songs %}
+                <a href="{{ url_for('song_page', song_id=song.song_id) }}"><div class="music-card">
+                    <h2>{{ song.title }}</h2>
+                    <h3>{{ song.artist }}</h3>
+                    <div class="img-container-library">
+                        <img src="{{ song.img_url }}" alt="picture of song and or songs artist">
+                    </div>
+                </div></a>
+            {% endfor %}
+        </div>
     </div>
     {% include 'footer.html' %}  
 </body>

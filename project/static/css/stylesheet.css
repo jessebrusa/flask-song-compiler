@@ -27,19 +27,26 @@ h1 {
     padding: 25px;
 }
 
-.direction-container {
-    background-color: rgba(157, 147, 148, .7);
-    border-radius: 20px;
-    width: 40%;
-    padding: 35px;
-    margin-top: 0%;
-    display: flex;
-    justify-content: space-around;
-    flex-wrap: wrap;
-    gap: 20px;
+
+.libraryHeader {
+    text-align: center;
 }
 
-.direction-container > a {
+.libraryBodyContainer {
+    display: flex;
+    
+}
+
+.navBar {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    gap: 40px;
+    margin-top: 20px;
+    width: 80%;
+}
+
+.navBar > a {
     text-decoration: none;
     color: #352a23;
     background-color: #a0a088;
@@ -51,6 +58,26 @@ h1 {
     font-family: 'cabin';
     margin-top: 10px;
     margin-bottom: 10px;
+    width: 200px;
+    text-align: center;
+}
+
+.navBar > a:hover {
+    transform: scale(1.2);
+}
+
+
+.navBar > a:active {
+    transform: scale(.85);
+}
+
+.homePage {
+    width: 30%;
+    display: flex;
+    flex-wrap: wrap;
+    background-color: rgba(157, 147, 148, .7);
+    padding: 20px;
+    border-radius: 20px;
 }
 
 .direction-container > a:hover {

@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, url_for, redirect, session, jsonify
-from flask_login import LoginManager, current_user, logout_user
+from flask_login import LoginManager, current_user, logout_user, login_required, UserMixin, login_user
 from werkzeug.security import generate_password_hash, check_password_hash
+from functools import wraps
 from ultimate_guitar_scraper import UltimateGuitarScraper
 from tab_scraper import TabScraper
 from all_music_scraper import AllMusicScraper
@@ -16,7 +17,6 @@ import asyncio
 import threading
 
 
-
 load_dotenv()
 GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
 GOOGLE_CX = os.getenv('GOOGLE_CX')
@@ -26,7 +26,7 @@ MUSIC_BRAINZ_CLIENT_ID = os.getenv('MUSIC_BRAINZ_CLIENT_ID')
 MUSIC_BRAINZ_CLIENT_SECRET = os.getenv('MUSIC_BRAINZ_CLIENT_SECRET')
 GENIUS_ACCESS_TOKEN = os.getenv('GENIUS_ACCESS_TOKEN')
 
-# Set the maximum number of connections in the pool
+
 max_connections = 5
 connection_pool = pool.SimpleConnectionPool(
     max_connections,
@@ -40,6 +40,39 @@ connection_pool = pool.SimpleConnectionPool(
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'la;sdjfaowiherojiqwke208935uijrklnwfd80ujioo23'
 
+login_manager = LoginManager(app)
+
+class User(UserMixin):
+    def __init__(self, user_id, email):
+        self.id = user_id
+        self.email = email
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port='5433') as conn:
+        with conn.cursor() as cursor:
+            cursor.execute("SELECT * FROM users WHERE user_id = %s", (user_id,))
+            user_data = cursor.fetchone()
+
+            if user_data:
+                user = User(user_data[0], user_data[1])
+                return user
+            else:
+                return None
+            
+
+def logged_in_only(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        try:
+            if current_user.is_authenticated:
+                return f(*args, **kwargs)
+            else:
+                return redirect(url_for('login_page'))
+        except AttributeError:
+            return redirect(url_for('login_page'))
+    return decorated_function
 
 
 @app.route('/')
@@ -89,8 +122,8 @@ def get_mp3(song_id):
     conn = pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port='5433')
     cur = conn.cursor()
 
-    sql = get_mp3_query(song_id)
-    Song = namedtuple('Song', get_mp3_table)
+    sql = get_title_artist_query(song_id)
+    Song = namedtuple('Song', get_title_artist_table)
     cur.execute(sql)
     info = [Song(*row) for row in cur.fetchall()][0]
 
@@ -140,36 +173,20 @@ def get_tab(song_id):
     conn = pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port='5433')
     cur = conn.cursor()
 
-    sql = get_title_query(song_id)
-    Song = namedtuple('Song', get_title_table)
+    sql = get_title_artist_query(song_id)
+    Song = namedtuple('Song', get_title_artist_table)
     cur.execute(sql)
     info = [Song(*row) for row in cur.fetchall()][0]
 
-    path = './static/tab/'
-    try:
-        scraper = UltimateGuitarScraper(info.title)
-        href = scraper.run_scrape()
-        if href:
-            scraper.run_downloader(href)
-
-            update_sql = update_data(song_id, 'tab_check', 'tab_url', f'.{path}{info.title}.pdf')
-            cur.execute(update_sql)
-            conn.commit()
-        else:
-            update_sql = update_fail_data(song_id, 'tab_check')
-            cur.execute(update_sql)
-            conn.commit()
-    except:
-        update_sql = update_fail_data(song_id, 'tab_check')
-        cur.execute(update_sql)
-        conn.commit()
-
-    conn.close
+    asyncio.run(gather_main(song_id, 'no', 'no', 'yes',
+                                    info.title, info.artist, 
+                                    cur, conn))
 
     return redirect(url_for('song_page', song_id=song_id))
 
 
 @app.route('/find-song', methods=['GET', 'POST'])
+@logged_in_only
 def find_song():
     if request.method == 'POST':
         print('it made post')
@@ -325,7 +342,6 @@ def find_song():
             print('beginning gather main')
             asyncio.run(gather_main(song_id, input_mp3, input_karaoke, input_tab,
                                     title, artist, 
-                                    # GOOGLE_API_KEY, GOOGLE_CX, GENIUS_ACCESS_TOKEN, 
                                     cur, conn))
 
             
@@ -342,6 +358,13 @@ def find_song():
 def delete_song_page(song_id):
     conn = pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port='5433')
     cur = conn.cursor()
+
+    cur.execute(get_all_search_id(song_id))
+    all_search_id = cur.fetchall()
+    print(all_search_id)
+    for search_id in all_search_id:
+        cur.execute(delete_search_id(search_id[0]))
+        conn.commit()
 
     delete_sql = delete_song(song_id)
     cur.execute(delete_sql)
@@ -413,18 +436,21 @@ def login_page():
 
             
             password_true = check_password_hash(user_dict['password'], password_input)
-            print('testing after')
-            print(password_true)
 
             if password_true:
-                print('password check')
+                print('password is true')
                 session['user_id'] = user_dict['user_id']
-                print('logged in')
+                print('in session')
+
+                user_object = User(user_dict['user_id'], user_dict['email'])
+
+                login_user(user_object)
+                print('user logged in')
+              
                 return redirect(url_for('library'))
 
 
             else:
-                print('pass not true')
                 password_not_true = True
 
         except:
@@ -434,6 +460,13 @@ def login_page():
     password_not_true = False
 
     return render_template('login.html', email_not_exist=email_not_exist, password_not_true=password_not_true)
+
+
+@app.route('/logout')
+@logged_in_only
+def logout():
+    logout_user()
+    return redirect(url_for('home_page'))
 
 
 if __name__ == '__main__':

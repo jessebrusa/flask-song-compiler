@@ -36,10 +36,10 @@ def song_page_info(song_id):
                 WHERE song.song_id = {song_id};'''
 
 
-get_mp3_table = ['song_id', 'title', 'artist']
+get_title_artist_table = ['song_id', 'title', 'artist']
 
 
-def get_mp3_query(song_id):
+def get_title_artist_query(song_id):
     return f'''
             SELECT song_id, title, artist FROM song
             WHERE song_id = {song_id};'''
@@ -178,6 +178,24 @@ def get_search_id(search_term):
     return f'''
             SELECT search_id FROM searches
             WHERE search_term = '{search_term}'
+            '''
+
+
+def get_all_search_id(song_id):
+    return f'''
+            SELECT searches.search_id FROM searches
+            INNER JOIN song_search ON song_search.search_id = searches.search_id
+            INNER JOIN song ON song.song_id = song_search.song_id
+            WHERE song.song_id = {song_id}
+            '''
+
+def delete_search_id(search_id):
+    return f'''
+            DELETE FROM song_search
+            WHERE search_id = {search_id};
+
+            DELETE FROM searches 
+            WHERE search_id = {search_id};
             '''
 
 
