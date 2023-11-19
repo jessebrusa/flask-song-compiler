@@ -556,6 +556,7 @@ label {
 .dashboardBody {
     width: 90%;
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-around;
     align-items: flex-start;
     margin-left: auto;
@@ -696,6 +697,11 @@ label {
 
     .searchSubmit {
         scale: .7;
+    }
+
+    .submitButton {
+        scale: .7;
+        font-size: 20px;
     }
 }
 

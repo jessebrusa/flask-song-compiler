@@ -9,12 +9,12 @@
 <body class="find-song-body">
     <form action="{{ url_for('login_page') }}" method="POST" class="registerLogin">
         <div class="rowItems">
-            <label for="title-name">Email: </label>
-            <input name="email" type="email" class="searchInput" required>
+            <label for="title-name" class="item1">Email: </label>
+            <input name="email" type="email" class="searchInput item2" required>
         </div>
         <div class="rowItems">
-            <label for="title-name">Password: </label>
-            <input name="password" type="password" class="searchInput" required>
+            <label for="title-name" class="item1">Password: </label>
+            <input name="password" type="password" class="searchInput item2" required>
         </div>
         <input type="submit" class="submitButton">
         {% if email_not_exist %}
