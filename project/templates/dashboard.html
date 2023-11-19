@@ -12,6 +12,17 @@
     <div class="dashboardBody">
         <div class="dashboardFavs">
             <h2>Favorites</h2>
+            {% for song in favorite_songs %}
+                <a href="{{ url_for('song_page', song_id=song.song_id) }}">
+                    <div class="favCard">
+                        <img src="{{ song.img }}" alt="image of a artist or album cover">
+                        <div class="dashboardTitleArtist">
+                            <h3>{{ song.title }}</h3>
+                            <h4>{{ song.artist }}</h4>
+                        </div>
+                    </div>
+                </a>
+            {% endfor %}
         </div>
         <div class="dashboardGroups">
             <h2>Groups</h2>

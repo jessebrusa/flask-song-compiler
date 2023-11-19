@@ -2,7 +2,6 @@ from flask import Flask, render_template, request, url_for, redirect, session, j
 from flask_login import LoginManager, current_user, logout_user, login_required, UserMixin, login_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
-from ultimate_guitar_scraper import UltimateGuitarScraper
 from tab_scraper import TabScraper
 from all_music_scraper import AllMusicScraper
 from asyncio_functions import gather_main
@@ -115,8 +114,51 @@ def catalogue():
 
 @app.route('/dashboard')
 def dashboard():
-    return render_template('dashboard.html')
+    user_id = current_user.id
 
+    with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port='5433') as conn:
+        with conn.cursor() as cur:
+            cur.execute(get_favorites(user_id))
+            favorite_songs_list = cur.fetchall()
+
+            favorite_songs = []
+            for song in favorite_songs_list:
+                favorite_songs.append(
+                        {
+                        'song_id': song[0],
+                        'title': song[1],
+                        'artist': song[2],
+                        'img': song[3]
+                    }
+                ) 
+
+    return render_template('dashboard.html', favorite_songs=favorite_songs)
+
+
+@app.route('/add-favorite/<int:song_id>')
+@logged_in_only
+def add_favorite(song_id):
+    user_id = current_user.id
+
+    with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port='5433') as conn:
+        with conn.cursor() as cur:
+            cur.execute(update_add_favorite(user_id, song_id))
+            conn.commit()
+
+    return redirect(url_for('song_page', song_id=song_id))
+
+
+@app.route('/remove-favorite/<int:song_id>')
+@logged_in_only
+def remove_favorite(song_id):
+    user_id = current_user.id
+
+    with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port='5433') as conn:
+        with conn.cursor() as cur:
+            cur.execute(update_remove_favorite(user_id, song_id))
+            conn.commit()
+
+    return redirect(url_for('song_page', song_id=song_id))
 
 @app.route('/connect-song/<int:song_id>')
 def connect_song(song_id):
@@ -131,16 +173,22 @@ def connect_song(song_id):
     return redirect(url_for('song_page', song_id=song_id))
 
 
-
 @app.route('/song-page/<int:song_id>')
 def song_page(song_id):
     conn = pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port='5433')
     cur = conn.cursor()
 
-    song_page_sql = song_page_info(song_id)
-    Song = namedtuple('Song', song_page_table)
-    cur.execute(song_page_sql)
-    info = [Song(*row) for row in cur.fetchall()][0]
+    if current_user.is_authenticated:
+        user_id = current_user.id
+        song_page_sql = song_page_info(song_id, user_id=user_id)
+        Song = namedtuple('Song', song_page_table_user)
+        cur.execute(song_page_sql)
+        info = [Song(*row) for row in cur.fetchall()][0]
+    else:
+        song_page_sql = song_page_info(song_id)
+        Song = namedtuple('Song', song_page_table)
+        cur.execute(song_page_sql)
+        info = [Song(*row) for row in cur.fetchall()][0]
     
 
     if info.lyric_url:
@@ -452,7 +500,7 @@ def register_page():
 
         conn.close()
 
-        session['user_id'] = user_id[0]
+        session['user_id'] = user_id
 
         user_object = User(user_id, f_name, l_name, 
                         username, email)
@@ -478,7 +526,6 @@ def login_page():
                 cur.execute(get_user(email))
                 user = cur.fetchone()
 
-            print(user)
             if user:
                 user_dict = {
                     'user_id': user[0],
@@ -488,7 +535,6 @@ def login_page():
                     'password': user[4],
                     'username': user[5],
                 }
-
             
             password_true = check_password_hash(user_dict['password'], password_input)
 

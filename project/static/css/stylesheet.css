@@ -297,16 +297,14 @@ h1 {
 }
 
 .hero-img-container {
+    flex: 1;
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 300px;
-    margin-right: 20px;
-    padding: 10px;
 }
 
 .hero-img-container img {
-    max-width: 300px;
+    max-width: 100%;
 }
 
 .nav-links {
@@ -322,7 +320,7 @@ h1 {
 
 .nav-links a{
     color: white;
-    width: 160px;
+    width: 200px;
     background-color: #e5ba88;
     border: 4px solid #9d9394;
     border-radius: 10px;
@@ -408,20 +406,13 @@ h1 {
 }
 
 .hero-text-container {
+    flex: 2;
     display: flex;
     flex-direction: column; 
     justify-content: space-between;
     text-align: center;
-    margin: 0 auto;
-    padding-top: -10px;
-    width: 500px;
 }   
 
-.hero-text-container h1 {
-    margin-top: -20px;
-    margin-bottom: 20px;
-    padding: 0;
-}
 
 .hero-text-container h2 {
     color: #352a23;
@@ -495,7 +486,6 @@ label {
 
 .searchInput {
     font-size: 50px;
-    width: 700px;
     height: 60px;
     border-radius: 20px;
 }
@@ -518,12 +508,20 @@ label {
 .rowItems {
     width: 100%;
     display: flex;
-    justify-content: flex-end;
+    align-items: center;
     gap: 10px;
 }
 
+.item1 {
+    flex: 1;
+    text-align: end;
+}
+
+.item2 {
+    flex: 1;
+}
+
 .radioWidth {
-    width: 700px;
     display: flex;
     justify-content: flex-start;
     align-items: center;
@@ -552,13 +550,134 @@ label {
 }
 
 .dashboardHeader {
-    margin: 10px;
+    margin: 0;
 }
 
 .dashboardBody {
     width: 90%;
     display: flex;
     justify-content: space-around;
+    align-items: flex-start;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.dashboardFavs {
+    text-align: center;
+    flex: 1;
+    color: #9d9394;
+    text-decoration: underline;
+    font-size: 40px;
+}
+
+.favCard {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #9d9394;
+    border-radius: 20px;
+    margin: 20px;
+    height: 130px;
+}
+
+.favCard:hover {
+    transform: scale(1.2);
+}
+
+.favCard:active {
+    transform: scale(.85);
+}
+
+.favCard img {
+    max-height: 100%;
+    width: auto;
+    border-radius: 20px;
+}
+
+.favCard h3 {
+    margin: 0;
+    font-size: 35px;
+    color: #352a23;
+}
+
+.favCard h4 {
+    margin: 0;
+    font-size: 25px;
+    color: #352a23;
+}
+
+.dashboardTitleArtist {
+    flex: 3;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.dashboardGroups {
+    text-align: center;
+    flex: 1;
+    color: #9d9394;
+    text-decoration: underline;
+    font-size: 40px;
+}
+
+
+.deleteButton {
+    text-decoration: none;
+    background-color: #9d9394;
+    width: 45%;
+    color: darkred;
+    padding: 10px;
+    border-radius: 20px;
+    margin: 50px;
+    text-align: center;
+    font-size: 50px;
+}
+
+.deleteButton:hover {
+    transform: scale(1.2);
+}
+
+.deleteButton:active {
+    transform: scale(.85);
+}
+
+.songPageFavorites {
+    flex: 1;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+    background-color: #352a23;
+    color: white;
+    border-radius: 20px;
+    text-align: center;
+    font-size: 40px;
+    padding: 10px;
+    margin: 10px 0px;
+}
+
+.songPageFavorites:hover {
+    transform: scale(1.05);
+}
+
+.songPageFavorites:active {
+    transform: scale(.85);
+}
+
+.favBox {
+    flex: 1;
+}
+
+.leftSongPage {
+    flex: 1;
+}
+
+.findSongHeader {
+    text-align: center;
+    width: 100%;
 }
 
 
@@ -569,6 +688,14 @@ label {
 
     .searchInput {
         width: 40%;
+    }
+
+    label {
+        font-size: 20px;
+    }
+
+    .searchSubmit {
+        scale: .7;
     }
 }
 

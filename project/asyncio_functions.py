@@ -1,7 +1,6 @@
 import asyncio
 from sql import *
 from resources import download_song, get_google_img, get_lyrics, download_karaoke
-from ultimate_guitar_scraper import UltimateGuitarScraper
 from tab_scraper import TabScraper
 
 

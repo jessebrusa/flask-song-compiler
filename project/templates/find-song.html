@@ -4,42 +4,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='../static/css/stylesheet.css') }}">
-    <!-- Add this to your HTML file -->
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <title>Find A Song</title>
 </head>
 <body class="find-song-body">
+    {% include 'header.html' %}
     <div class="library-header">
-        <a href="{{ url_for('library') }}">Music Library</a>
-        <h1>Find A Song</h1>
-        <div class="temp-search"></div>
+        <h1 class="findSongHeader">Find A Song</h1>
     </div>
     <form method="POST" action="{{ url_for('find_song') }}" id="myForm">
         <div class="rowItems">
-            <label for="title-name">Song Title: </label>
-            <input name="title" type="text" class="searchInput" required>
+            <label for="title-name" class="item1">Song Title: </label>
+            <input name="title" type="text" class="searchInput item2" required>
         </div>
         <div class="rowItems">
-            <label for="title-name">(Not Required) Artist: </label>
-            <input name="artist" type="text" class="searchInput">
+            <label for="title-name" class="item1">(Not Required) Artist: </label>
+            <input name="artist" type="text" class="searchInput item2">
         </div>
         <div class="rowItems">
-            <label for="title-name">Search Mp3?: </label>
-            <div class="radioWidth">
+            <label for="title-name" class="item1">Search Mp3?: </label>
+            <div class="radioWidth item2">
                 Yes:<input name="mp3YesNo" type="radio" value="yes" class="radio" checked>
                 No:<input name="mp3YesNo" type="radio" value="no" class="radio">
             </div>
         </div>
         <div class="rowItems">
-            <label for="title-name">Search Karaoke?: </label>
-            <div class="radioWidth">
+            <label for="title-name" class="item1">Search Karaoke?: </label>
+            <div class="radioWidth item2">
                 Yes:<input name="karaokeYesNo" type="radio" value="yes" class="radio" checked>
                 No:<input name="karaokeYesNo" type="radio" value="no" class="radio">
             </div>
         </div>
         <div class="rowItems">
-            <label for="title-name">Search Tabs?: </label>
-            <div class="radioWidth">
+            <label for="title-name" class="item1">Search Tabs?: </label>
+            <div class="radioWidth item2">
                 Yes:<input name="tabYesNo" type="radio" value="yes" class="radio" checked>
                 No:<input name="tabYesNo" type="radio" value="no" class="radio">
             </div>
@@ -54,33 +52,25 @@
     <script>
         $(document).ready(function () {
             $("#myForm").submit(function (event) {
-                // Prevent the default form submission
                 event.preventDefault();
 
                 $("#myForm").hide();
 
-                // Show the loading message
                 $("#loading").show();
     
-                // Serialize the form data
                 var formData = $(this).serialize();
     
-                // Use AJAX to submit the form data
                 $.ajax({
                     type: "POST",
                     url: $(this).attr("action"),
                     data: formData,
                     success: function (response) {
-                        // Handle the response if needed
-    
-                        // Hide the loading message
+   
                         $("#loading").hide();
                         window.location.href = response.redirect;
                     },
                     error: function (error) {
-                        // Handle the error if needed
     
-                        // Hide the loading message
                         $("#loading").hide();
                     }
                 });
