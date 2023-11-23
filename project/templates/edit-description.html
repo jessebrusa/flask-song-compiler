@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/css/stylesheet.css">
+    <title>Register</title>
+</head>
+<body class="find-song-body">
+    {% include 'header.html' %}
+    <form action="{{ url_for('edit_description', party_id=info.party_id) }}" method="POST" class="registerLogin">
+        {% if description %}
+            <p class="editP">{{ description }}</p>
+        {% endif %}
+        <div class="rowItems">
+            <label for="title-name" class="item1">Description: </label>
+            <textarea class="messageBox" name="description_box"></textarea>
+        </div>
+        <input type="submit" class="submitButton">
+    </form>
+    {% include 'footer.html' %}
+</body>
+</html>

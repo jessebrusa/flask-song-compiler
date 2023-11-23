@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/css/stylesheet.css">
+    <title>Register</title>
+</head>
+<body class="find-song-body">
+    {% include 'header.html' %}
+    <form action="{{ url_for('invite_user', party_id=party_id) }}" method="POST" class="registerLogin">
+        <div class="rowItems">
+            <label for="title-name" class="item1">Username that you want to invite: </label>
+            <input name="username" type="text" class="searchInput item2" required>
+        </div>
+        <div class="rowItems">
+            <label for="title-name" class="item1">Will this user be an admin: </label>
+            <div class="radioWidth item2">
+                Yes:<input name="adminYesNo" type="radio" value="yes" class="radio">
+                No:<input name="adminYesNo" type="radio" value="no" class="radio" checked>
+            </div>
+        </div>
+        <input type="submit" class="submitButton">
+    </form>
+    {% include 'footer.html' %}
+</body>
+</html>

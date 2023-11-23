@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='../static/css/stylesheet.css') }}">
+    <title>{{ info.name }}</title>
+</head>
+<body class="library-body">
+    {% include 'header.html' %}
+    <h1 class="libraryHeader">{{ info.name }}</h1>
+        {% if info.description %}
+            <p class="partyDescription">{{ info.description }}</p>
+        {% endif %}
+        <div class="music-card-container">
+            {% for song in songs %}
+                <a href="{{ url_for('song_page', song_id=song.song_id) }}"><div class="music-card">
+                    <h2>{{ song.title }}</h2>
+                    <h3>{{ song.artist }}</h3>
+                    <div class="img-container-library">
+                        <img src="{{ song.img_url }}" alt="picture of song and or songs artist">
+                    </div>
+                </div></a>
+            {% endfor %}
+        </div>
+        {% if info.administrator %}
+            <div class="adminOptionsContainer">
+                <a href="{{ url_for('invite_user', party_id=info.party_id) }}">ADD USER TO GROUP</a>
+                <a href="{{ url_for('edit_description', party_id=info.party_id) }}">EDIT GROUP DESCRIPTION</a>
+                <a href="{{ url_for('edit_group_name', party_id=info.party_id) }}">EDIT GROUP NAME</a>
+                <a href="{{ url_for('leave_group', party_id=info.party_id) }}" class="deleteGroup">LEAVE GROUP</a>
+                <a href="{{ url_for('delete_group', party_id=info.party_id) }}" class="deleteGroup">DELETE GROUP</a>
+            </div>
+        {% else %}
+            <div class="adminOptionsContainer">
+                <a href="{{ url_for('leave_group', party_id=info.party_id) }}" class="deleteGroup">LEAVE GROUP</a>
+            </div>
+        {% endif %}
+    </div>
+    {% include 'footer.html' %}  
+</body>
+</html>

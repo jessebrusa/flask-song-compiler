@@ -120,6 +120,7 @@ h1 {
     font-size: 15px;
     font-family: 'cabin';
     box-sizing: border-box;
+    margin-top: 40px;
 }
 
 .library-body {
@@ -564,11 +565,14 @@ label {
 }
 
 .dashboardFavs {
-    text-align: center;
     flex: 1;
+}
+
+.dashboardFavs h2 {
     color: #9d9394;
     text-decoration: underline;
-    font-size: 40px;
+    font-size: 80px;
+    text-align: center;
 }
 
 .favCard {
@@ -577,7 +581,7 @@ label {
     align-items: center;
     background-color: #9d9394;
     border-radius: 20px;
-    margin: 20px;
+    margin: 40px;
     height: 130px;
 }
 
@@ -616,13 +620,36 @@ label {
 }
 
 .dashboardGroups {
-    text-align: center;
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.dashboardGroups h2 {
     color: #9d9394;
     text-decoration: underline;
+    font-size: 80px;
+    text-align: center;
+}
+
+.createGroupLink {
+    text-decoration: none;
+    color: black;
+    background-color: #e5ba88;
+    padding: 15px;
+    border-radius: 20px;
     font-size: 40px;
 }
 
+.createGroupLink:hover {
+    transform: scale(1.2);
+}
+
+.createGroupLink:active {
+    transform: scale(.85);
+}
 
 .deleteButton {
     text-decoration: none;
@@ -681,6 +708,172 @@ label {
     width: 100%;
 }
 
+.messageBox {
+    font-size: 20px;
+    height: 200px;
+    flex: 1;
+}
+
+.margin20 {
+    margin-top: 85px;
+}
+
+.partyCardA {
+    text-decoration: none;
+    width: 70%;
+    text-align: center;
+    background-color: #9d9394;
+    color: #352a23;
+    height: 130px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 20px;
+    border-radius: 20px;
+    font-size: 35px;
+}
+
+.partyCardA:hover {
+    transform: scale(1.2);
+}
+
+.partyCardA:active {
+    transform: scale(.85);
+}
+
+
+.partyDescription {
+    background-color: #352a23;
+    color: white;
+    width: 50%;
+    text-align: center;
+    padding: 15px;
+    border-radius: 20px;
+    text-shadow: -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000; 
+    font-size: 35px;
+}
+
+.selectGrouph2 {
+    font-size: 55px;
+    color: #a0a088;
+}
+
+.selectGroup {
+    text-decoration: none;
+    background-color: #9d9394;
+    color: #352a23;
+    font-size: 40px;
+    padding: 15px;
+    border-radius: 20px;
+    width: 30%;
+    text-align: center;
+    margin: 25px;
+}
+
+
+.selectGroup:hover {
+    transform: scale(1.2);
+}
+
+.selectGroup:active {
+    transform: scale(.85);
+}
+
+
+.adminOptionsContainer {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 50px;
+    width: 80%;
+}
+
+.adminOptionsContainer a {
+    background-color: #a0a088;
+    color: #000;
+    padding: 15px;
+    font-size: 25px;
+    flex: 2;
+    text-align: center;
+    border-radius: 20px;
+}
+
+.adminOptionsContainer a:hover {
+    transform: scale(1.12);
+}
+
+.adminOptionsContainer a:active {
+    transform: scale(.85);
+}
+
+.adminOptionsContainer .deleteGroup  {
+    background-color: darkred;
+    color: white;
+    flex: 1;
+}
+
+.editP {
+    font-size: 55px;
+}
+
+.invCard {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.padding10 {
+    padding: 10px;
+}
+
+.acceptDecline {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+}
+
+.acceptDecline a:hover {
+    transform: scale(1.2);
+}
+
+.acceptDecline a:active {
+    transform: scale(.85);
+}
+
+.scale105:hover {
+    transform: scale(1.05);
+}
+
+.acceptParty {
+    background-color: darkgreen;
+    text-decoration: none;
+    flex: 1;
+    font-size: 30px;
+    padding: 10px;
+    color: white;
+    border-radius: 20px;
+}
+
+.declineParty {
+    text-decoration: none;
+    background-color: darkred;
+    flex: 1;
+    font-size: 30px;
+    padding: 10px;
+    color: white;
+    border-radius: 20px;
+}
+
+.flex1 {
+    flex: 1;
+}
+
+.flex5 {
+    flex: 5;
+}
 
 @media screen and (max-width: 1500px) {
     .hero-container {

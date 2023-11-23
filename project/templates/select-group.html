@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='../static/css/stylesheet.css') }}">
+    <title>Select A Group</title>
+</head>
+<body class="library-body">
+    {% include 'header.html' %}
+        <h1>Select What Group You Want To Add</h1>
+        <h2 class="selectGrouph2">{{ info.title }}</h2>
+    {% for party in parties %}
+        <a href="{{ url_for('connect_group_song', party_id=party.party_id, song_id=info.song_id) }}" class="selectGroup">{{ party.name }}</a>
+    {% endfor %}
+    {% include 'footer.html' %}
+</body>
+</html>

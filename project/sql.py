@@ -120,21 +120,20 @@ def query_search_terms(search):
             '''
 
 
-def insert_new_song(title, artist):
-    return f'''
+def insert_new_song():
+    return '''
             INSERT INTO song(title, artist)
             Values(
-                '{title.replace("'", "''")}',
-                '{artist.replace("'", "''")}'
-            )'''
+                %s,
+                %s
+            );
+            '''
 
 
-def get_song_id(title):
-    if "'" in title:
-        title = title.replace("'", "''")
-    return f'''
+def get_song_id():
+    return '''
             SELECT song_id FROM song
-            WHERE title = '{title}'
+            WHERE title = %s;
             '''
 
 
@@ -159,6 +158,9 @@ def update_value(song_id, table, field, value):
 
 def delete_song(song_id):
     return f'''
+            DELETE FROM user_song
+            WHERE song_id = {song_id};
+
             DELETE FROM url
             WHERE song_id = {song_id};
 
@@ -176,19 +178,19 @@ def insert_new_search_term(new_search_term):
             '''
 
 
-def search_term_id(search_term):
-    return f'''
+def search_term_id():
+    return '''
             SELECT search_id FROM searches
-            WHERE search_term = '{search_term}'
+            WHERE search_term = %s;
             '''
 
 
-def insert_new_song_search(song_id, search_id):
-    return f'''
+def insert_new_song_search():
+    return '''
             INSERT INTO song_search(song_id, search_id)
             VALUES(
-                {song_id},
-                {search_id}
+                %s,
+                %s
             )
             '''
 
@@ -236,23 +238,21 @@ def delete_search_id(search_id):
             '''
 
 
-def insert_new_search(search_term):
-    if "'" in search_term:
-        search_term = search_term.replace("'", "''")
-    return f'''
+def insert_new_search():
+    return '''
             INSERT INTO searches(search_term)
             VALUES(
-                '{search_term}'
-            )
+                %s
+            );
             '''
 
 
-def insert_song_search(song_id, search_id):
-    return f'''
+def insert_song_search():
+    return '''
             INSERT INTO song_search(song_id, search_id)
             VALUES(
-                {song_id},
-                {search_id}
+                %s,
+                %s
             )
             '''
 
@@ -295,13 +295,13 @@ user_table = ['user_id', 'email', 'password']
 
 
 
-def insert_user_song(user_id, song_id):
-    return f'''
+def insert_user_song():
+    return '''
             INSERT INTO user_song(user_id, song_id)
             VALUES(
-                {user_id},
-                {song_id}
-            )
+                %s,
+                %s
+            );
             '''
 
 
@@ -327,4 +327,133 @@ def update_remove_favorite(user_id, song_id):
     return f'''
             UPDATE user_song SET favorite = false
             WHERE user_id = {user_id} AND song_id = {song_id};
+            '''
+
+
+def insert_create_group(name, **kwargs):
+    description = kwargs.get('description')
+    if "'" in name:
+        name = name.replace("'", "''")
+    if description:
+        if "'" in description:
+            description = description.replace("'", "''")
+    if description:
+        return f'''
+                INSERT INTO party(name, description)
+                VALUES(
+                    '{name}',
+                    '{description}'
+                )
+                RETURNING party_id;
+                '''
+    else:
+        return f'''
+                INSERT INTO party(name)
+                VALUES(
+                    '{name}'
+                )
+                RETURNING party_id;
+                '''
+    
+
+def insert_party_user_admin(party_id, user_id):
+    return '''
+            INSERT INTO party_user(party_id, user_id, accept, administrator)
+            VALUES (%s, %s, true, true);
+            '''
+
+def get_party(user_id):
+    return f'''
+            SELECT party_user.party_id, party.name, party_user.accept FROM party_user
+            INNER JOIN party ON party.party_id = party_user.party_id
+            WHERE party_user.user_id = {user_id};
+            '''
+
+
+def get_party_info(party_id, user_id):
+    return f'''
+            SELECT party.party_id, party.name, party.description, party_user.administrator
+            FROM party
+            INNER JOIN party_user ON party_user.party_id = party.party_id
+            WHERE party.party_id = %s AND party_user.user_id = %s;
+            '''
+
+
+def get_party_songs(party_id):
+    return f'''
+            SELECT 
+                song.song_id,
+                song.title,
+                song.artist,
+                url.img_url
+            FROM party
+            INNER JOIN party_song ON party_song.party_id = party.party_id
+            INNER JOIN song ON song.song_id = party_song.song_id
+            INNER JOIN url ON song.song_id = url.song_id
+            WHERE party.party_id = {party_id};
+            '''
+
+
+def insert_party_song(party_id, song_id):
+    return f'''
+            INSERT INTO party_song(party_id, song_id)
+            VALUES(
+                {party_id},
+                {song_id}
+            );
+            '''
+
+
+def delete_party():
+    return '''
+            DELETE FROM party_user
+            WHERE party_id = %s;
+
+            DELETE FROM party_song
+            WHERE party_id = %s;
+
+            DELETE FROM party
+            WHERE party_id = %s;
+            '''
+
+
+def update_description():
+    return '''
+            UPDATE party SET description = %s
+            WHERE party_id = %s
+            '''
+
+
+def update_group_name():
+    return '''
+            UPDATE party SET name = %s
+            WHERE party_id = %s
+            '''
+
+
+def delete_leave_group():
+    return '''
+            DELETE FROM party_user
+            WHERE user_id = %s AND party_id = %s;
+            '''
+
+
+def add_user_group():
+    return '''
+            INSERT INTO party_user(party_id, user_id, administrator)
+            VALUES(%s, %s, %s);
+            '''
+
+
+def get_user_id():
+    return '''
+            SELECT user_id FROM users
+            WHERE username ILIKE %s;
+            '''
+
+
+def update_accept_group():
+    return '''
+            UPDATE party_user SET accept = true
+            WHERE user_id = %s AND party_id = %s;
             '''

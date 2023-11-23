@@ -132,8 +132,260 @@ def dashboard():
                     }
                 ) 
 
-    return render_template('dashboard.html', favorite_songs=favorite_songs)
 
+            cur.execute(get_party(user_id))
+            parties_list = cur.fetchall()
+
+            parties = []
+            for party in parties_list:
+                parties.append(
+                    {
+                        'party_id': party[0],
+                        'name': party[1],
+                        'accept': party[2]
+                    }
+                )
+
+
+    return render_template('dashboard.html', favorite_songs=favorite_songs, parties=parties)
+
+
+@app.route('/group-page/<int:party_id>')
+def group_page(party_id):
+    with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port='5433') as conn:
+        with conn.cursor() as cur:
+            user_id = current_user.id
+            cur.execute(get_party_info(party_id, user_id), (party_id, user_id))
+            party_data = cur.fetchone()
+
+            if len(party_data) == 4:
+                info = {
+                    'party_id': party_data[0],
+                    'name': party_data[1],
+                    'description': party_data[2],
+                    'administrator': party_data[3]
+                }
+            else:
+                info = {
+                    'party_id': party_data[0],
+                    'name': party_data[1],
+                    'administrator': party_data[2]
+                }
+
+            cur.execute(get_party_songs(party_id))
+            songs_list = cur.fetchall()
+
+            songs = []
+            for song in songs_list:
+                songs.append(
+                    {
+                        'song_id': song[0],
+                        'title': song[1],
+                        'artist': song[2],
+                        'img_url': song[3]
+                    }
+                )
+
+
+    return render_template('group.html', info=info, songs=songs)
+
+
+@app.route('/select-group/<int:song_id>')
+@logged_in_only
+def select_group(song_id):
+    user_id = current_user.id
+
+    with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port='5433') as conn:
+        with conn.cursor() as cur:
+            cur.execute(get_party(user_id))
+            parties_list = cur.fetchall()
+
+            parties = []
+            for party in parties_list:
+                parties.append(
+                    {
+                        'party_id': party[0],
+                        'name': party[1],
+                        'accept': party[2]
+                    }
+                )
+
+
+            user_id = current_user.id
+            song_page_sql = song_page_info(song_id, user_id=user_id)
+            Song = namedtuple('Song', song_page_table_user)
+            cur.execute(song_page_sql)
+            info = [Song(*row) for row in cur.fetchall()][0]
+
+    return render_template('select-group.html', parties=parties, info=info)
+
+
+@app.route('/connect-group-song/<int:party_id>/<int:song_id>')
+@logged_in_only
+def connect_group_song(party_id, song_id):
+    with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port='5433') as conn:
+        with conn.cursor() as cur:
+            cur.execute(insert_party_song(party_id, song_id))
+            conn.commit()
+
+    return redirect(url_for('group_page', party_id=party_id))
+
+
+@app.route('/delete-group/<int:party_id>')
+def delete_group(party_id):
+    with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port='5433') as conn:
+        with conn.cursor() as cur:
+            user_id = current_user.id
+            cur.execute(get_party_info(party_id, user_id), (party_id, user_id))
+            party_data = cur.fetchone()
+
+            if len(party_data) == 4:
+                info = {
+                    'party_id': party_data[0],
+                    'name': party_data[1],
+                    'description': party_data[2],
+                    'administrator': party_data[3]
+                }
+            else:
+                info = {
+                    'party_id': party_data[0],
+                    'name': party_data[1],
+                    'administrator': party_data[2]
+                }
+
+
+
+            if info['administrator']:
+                cur.execute(delete_party(), (party_id, party_id, party_id))
+                conn.commit()
+
+
+    return redirect(url_for('dashboard'))
+
+
+@app.route('/edit-group-name/<int:party_id>', methods=['GET', 'POST'])
+def edit_group_name(party_id):
+    if request.method == 'POST':
+        new_name = request.form.get('group_name')
+
+        if new_name:
+            with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port='5433') as conn:
+                with conn.cursor() as cur:
+                    cur.execute(update_group_name(), (new_name, party_id))
+                    conn.commit()
+
+        return redirect(url_for('group_page', party_id=party_id))
+
+    with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port='5433') as conn:
+        with conn.cursor() as cur:
+            user_id = current_user.id
+            cur.execute(get_party_info(party_id, user_id), (party_id, user_id))
+            party_data = cur.fetchone()
+
+            if len(party_data) == 4:
+                info = {
+                    'party_id': party_data[0],
+                    'name': party_data[1],
+                    'description': party_data[2],
+                    'administrator': party_data[3]
+                }
+            else:
+                info = {
+                    'party_id': party_data[0],
+                    'name': party_data[1],
+                    'administrator': party_data[2]
+                }
+
+
+    return render_template('edit-name.html', info=info)
+
+
+@app.route('/edit-description/<int:party_id>', methods=['GET', 'POST'])
+def edit_description(party_id):
+    if request.method == 'POST':
+        new_description = request.form.get('description_box')
+
+        if new_description:
+            with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port='5433') as conn:
+                with conn.cursor() as cur:
+                    cur.execute(update_description(), (new_description, party_id))
+                    conn.commit()
+
+        return redirect(url_for('group_page', party_id=party_id))
+
+    with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port='5433') as conn:
+        with conn.cursor() as cur:
+            user_id = current_user.id
+            cur.execute(get_party_info(party_id, user_id), (party_id, user_id))
+            party_data = cur.fetchone()
+
+            if len(party_data) == 4:
+                info = {
+                    'party_id': party_data[0],
+                    'name': party_data[1],
+                    'description': party_data[2],
+                    'administrator': party_data[3]
+                }
+            else:
+                info = {
+                    'party_id': party_data[0],
+                    'name': party_data[1],
+                    'administrator': party_data[2]
+                }
+
+            if info['description']:
+                description = info['description']
+            else:
+                description = None
+
+    return render_template('edit-description.html', description=description, info=info)
+
+
+@app.route('/leave-group/<int:party_id>')
+def leave_group(party_id):
+    with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port='5433') as conn:
+        with conn.cursor() as cur:
+            user_id = current_user.id
+            cur.execute(delete_leave_group(), (user_id, party_id))
+            conn.commit()
+
+    return redirect(url_for('dashboard'))
+
+
+@app.route('/accept-group/<int:party_id>')
+def accept_group(party_id):
+    with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port='5433') as conn:
+        with conn.cursor() as cur:
+            user_id = current_user.id
+            cur.execute(update_accept_group(), (user_id, party_id))
+            conn.commit()
+
+    return redirect(url_for('dashboard'))
+
+@app.route('/invite-user/<int:party_id>', methods=['GET', 'POST'])
+def invite_user(party_id):
+    if request.method == 'POST':
+        inv_username = request.form.get('username')
+        inv_admin = request.form.get('adminYesNo')
+        if inv_admin == 'yes':
+            inv_admin = True
+        else:
+            inv_admin = False
+
+        with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port='5433') as conn:
+                with conn.cursor() as cur:
+                    try:
+                        cur.execute(get_user_id(), (inv_username,))
+                        inv_user_id = cur.fetchone()[0]
+
+                        cur.execute(add_user_group(), (party_id, inv_user_id, inv_admin))
+                        conn.commit()
+                    except:
+                        return redirect(url_for('dashboard'))
+                                      
+        return redirect(url_for('group_page', party_id=party_id))
+
+    return render_template('invite-user.html', party_id=party_id)
 
 @app.route('/add-favorite/<int:song_id>')
 @logged_in_only
@@ -159,6 +411,38 @@ def remove_favorite(song_id):
             conn.commit()
 
     return redirect(url_for('song_page', song_id=song_id))
+
+
+@app.route('/create-group', methods=['GET', 'POST'])
+@logged_in_only
+def create_group():
+    if request.method == 'POST':
+        group_name = request.form.get('group_name')
+        description = request.form.get('description_box')
+  
+
+        with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port='5433') as conn:
+            with conn.cursor() as cur:
+                if description:
+                    cur.execute(insert_create_group(group_name, description=description))
+                else:
+                    cur.execute(insert_create_group(group_name))
+
+                party_id = cur.fetchone()[0]
+                user_id = current_user.id
+
+                cur.execute(insert_party_user_admin(party_id, user_id), (party_id, user_id))
+
+
+                conn.commit()
+
+
+                return redirect(url_for('group_page', party_id=party_id))
+                
+
+
+    return render_template('create-group.html')
+
 
 @app.route('/connect-song/<int:song_id>')
 def connect_song(song_id):
@@ -263,9 +547,11 @@ def get_tab(song_id):
     cur.execute(sql)
     info = [Song(*row) for row in cur.fetchall()][0]
 
+
     asyncio.run(gather_main(song_id, 'no', 'no', 'yes',
                                     info.title, info.artist, 
                                     cur, conn))
+
 
     return redirect(url_for('song_page', song_id=song_id))
 
@@ -346,47 +632,35 @@ def find_song():
 
 
 #########################################################################################################
-            sql_new_song = insert_new_song(title, artist)
-            cur.execute(sql_new_song)
-            conn.commit()
+            cur.execute(insert_new_song(), (title, artist))
 
-            song_id_sql = get_song_id(title)
-            cur.execute(song_id_sql)
+            cur.execute(get_song_id(), (title, ))
             song_id = cur.fetchone()[0]
 
-            cur.execute(insert_user_song(user_id, song_id))
-            conn.commit()
-
-            new_search_term_input_sql = insert_new_search(input_title)
-            cur.execute(new_search_term_input_sql)
-            conn.commit()
-
-            input_search_id_sql = search_term_id(input_title)
-            cur.execute(input_search_id_sql)
+            cur.execute(insert_user_song(), (user_id, song_id))
+  
+            cur.execute(insert_new_search(), (input_title, ))
+ 
+            cur.execute(search_term_id(), (input_title, ))
             input_search_id = cur.fetchone()[0]
 
-            input_song_search_sql = insert_song_search(song_id, input_search_id)
-            cur.execute(input_song_search_sql)
-            conn.commit()
-
-            new_search_term_sql = insert_new_search(title)
-            cur.execute(new_search_term_sql)
-            conn.commit()
-
-            search_id_sql = search_term_id(title)
-            cur.execute(search_id_sql)
+            cur.execute(insert_song_search(), (song_id, input_search_id))
+           
+            cur.execute(insert_new_search(), (title, ))
+        
+            cur.execute(search_term_id(), (title, ))
             search_id = cur.fetchone()[0]
 
-            song_search_sql = insert_song_search(song_id, search_id)
-            cur.execute(song_search_sql)
-            conn.commit()
+            cur.execute(insert_song_search(), (song_id, search_id))
+       
 
             insert_url_sql = insert_new_record(song_id, 'url')
             cur.execute(insert_url_sql)
-            conn.commit()
+   
 
             insert_attempt_sql = insert_new_record(song_id, 'attempt')
             cur.execute(insert_attempt_sql)
+
             conn.commit()
             
 #########################################################################################################
@@ -403,14 +677,9 @@ def find_song():
 
 #########################################################################################################            
             try:
-                if artist:
-                    lyrics = get_lyrics(GENIUS_ACCESS_TOKEN, title, artist=artist)
-                    if lyrics is None:
-                        lyrics = obtain_lyrics(title, artist=artist)
-                else:
+                lyrics = obtain_lyrics(title)
+                if lyrics is None:
                     lyrics = get_lyrics(GENIUS_ACCESS_TOKEN, title)
-                    if lyrics is None:
-                        lyrics = obtain_lyrics(title, artist=artist)
             except:
                 lyrics = None
 
@@ -431,17 +700,17 @@ def find_song():
                 cur.execute(lyric_attempt_sql)
                 conn.commit()
 #########################################################################################################
-
+      
             asyncio.run(gather_main(song_id, input_mp3, input_karaoke, input_tab,
                                     title, artist, 
                                     cur, conn))
-
-            
+        
             conn.close()
 
             redirect_url = url_for('song_page', song_id=song_id)
             return jsonify({'redirect': redirect_url})
-   
+        
+           
 
     return render_template('find-song.html')
 

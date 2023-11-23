@@ -15,9 +15,9 @@ class TabScraper:
             try:
                 await page.goto(self.url, wait_until='domcontentloaded')
                 await page.wait_for_selector('div.djFV9', timeout=5000)
-
                 html = await page.content()
-            except asyncio.TimeoutError:
+            except Exception as e:
+                print(f'Error: {e}')
                 return None
 
             with open('scrape-for-link.html', 'w', encoding='utf-8') as file:

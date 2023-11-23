@@ -1,12 +1,11 @@
 import asyncio
 from sql import *
-from resources import download_song, get_google_img, get_lyrics, download_karaoke
+from resources import download_song, download_karaoke
 from tab_scraper import TabScraper
 
 
 
 async def download_mp3_async(title, artist, song_id, cur, conn):
-    print('mp3')
     path = './static/mp3/'
     if download_song(title, artist, path):
         update_sql = update_data(song_id, 'mp3_check', 'mp3_url', f'.{path}{title}.mp3')
@@ -16,11 +15,9 @@ async def download_mp3_async(title, artist, song_id, cur, conn):
         update_sql = update_fail_data(song_id, 'mp3_check')
         cur.execute(update_sql)
         conn.commit()
-    print('mp3 finished')
 
 
 async def download_karaoke_async(title, song_id, cur, conn):
-    print('karaoke')
     path = './static/karaoke/'
     download_track = download_karaoke(title, path)
     if download_track:
@@ -31,11 +28,9 @@ async def download_karaoke_async(title, song_id, cur, conn):
         update_sql = update_fail_data(song_id, 'karaoke_check')
         cur.execute(update_sql)
         conn.commit()
-    print('karaoke finished')
 
 
 async def download_tab_async(title, song_id, cur, conn):
-    print('tab')
     path = './static/tab/'
     scraper = TabScraper(title)
     href = await scraper.run_scrape()
@@ -49,7 +44,6 @@ async def download_tab_async(title, song_id, cur, conn):
         update_sql = update_fail_data(song_id, 'tab_check')
         cur.execute(update_sql)
         conn.commit()
-    print('tab finished')
 
 async def gather_main(song_id, input_mp3, input_karaoke, input_tab, title, artist, 
                     #   GOOGLE_API_KEY, GOOGLE_CX, GENIUS_ACCESS_TOKEN, 
