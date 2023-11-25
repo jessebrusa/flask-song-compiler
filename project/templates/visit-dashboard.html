@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='../static/css/stylesheet.css') }}">
+    <title>Music Library</title>
+</head>
+<body class="library-body">
+    {% include 'header.html' %}
+    <h1 class="dashboardHeader">Welcome To {{ username }}'s Page</h1>
+    <div class="dashboardBody">
+        <div class="dashboardFavs">
+            <h2>Favorites</h2>
+            <div class="margin20"></div>
+            {% for song in favorite_songs %}
+                <a href="{{ url_for('song_page', song_id=song.song_id) }}">
+                    <div class="favCard">
+                        <img src="{{ song.img }}" alt="image of a artist or album cover">
+                        <div class="dashboardTitleArtist">
+                            <h3>{{ song.title }}</h3>
+                            <h4>{{ song.artist }}</h4>
+                        </div>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+        <div class="dashboardGroups">
+            <h2>Groups</h2>
+            {% if parties %}
+                {% for party in parties %}
+                    {% if party.accept %}
+                        <a href="{{ url_for('group_page', party_id=party.party_id) }}" class="partyCardA">
+                            <div class="partyCard">
+                                <h3>{{ party.name }}</h3>
+                            </div>
+                        </a>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+    {% include 'footer.html' %}  
+</body>
+</html>

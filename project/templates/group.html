@@ -12,16 +12,52 @@
         {% if info.description %}
             <p class="partyDescription">{{ info.description }}</p>
         {% endif %}
-        <div class="music-card-container">
-            {% for song in songs %}
-                <a href="{{ url_for('song_page', song_id=song.song_id) }}"><div class="music-card">
-                    <h2>{{ song.title }}</h2>
-                    <h3>{{ song.artist }}</h3>
-                    <div class="img-container-library">
-                        <img src="{{ song.img_url }}" alt="picture of song and or songs artist">
+        <div class="groupBodyContainer">
+            <div class="groupUsersContainer flex1">
+                <h2><u>Users</u></h2>
+                {% for user in users %}
+                    {% if current_user.username != user.username %}
+                        <div class="userSideBar">
+                            {% if info.administrator %}
+                                {% if user.administrator %}
+                                    <a href="{{ url_for('visit_dashboard', user_id=user.user_id) }}">
+                                        <h3>{{ user.username }}</h3>
+                                    </a>    
+                                {% else %}
+                                    <a href="{{ url_for('visit_dashboard', user_id=user.user_id) }}">
+                                        <h3>{{ user.username }}</h3>
+                                    </a>
+                                    <a href="{{ url_for('make_user_group_admin', party_id=info.party_id, user_id=user.user_id) }}" class="adminUser">Make User Admin</a>
+                                {% endif %}
+                            {% else %}
+                                <a href="{{ url_for('visit_dashboard', user_id=user.user_id) }}">
+                                    <h3>{{ user.username }}</h3>
+                                </a>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <div class="music-card-container">
+                {% for song in songs %}
+                    <div class="musicCardRemoveContainer">
+                        <a href="{{ url_for('song_page', song_id=song.song_id) }}">
+                            <div class="musicCardBody">
+                                <div class="music-card">
+                                    <h2>{{ song.title }}</h2>
+                                    <h3>{{ song.artist }}</h3>
+                                    <div class="img-container-library">
+                                        <img src="{{ song.img_url }}" alt="picture of song and or songs artist">
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                        {% if info.administrator %}
+                            <a href="{{ url_for('remove_song_from_group', party_id=info.party_id, song_id=song.song_id) }}" class="removeSong">REMOVE SONG</a>
+                        {% endif %}
                     </div>
-                </div></a>
-            {% endfor %}
+                {% endfor %}
+            </div>
         </div>
         {% if info.administrator %}
             <div class="adminOptionsContainer">

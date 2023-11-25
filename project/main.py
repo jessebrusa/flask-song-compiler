@@ -13,7 +13,6 @@ from collections import namedtuple
 from dotenv import load_dotenv
 import os
 import asyncio
-import threading
 
 
 load_dotenv()
@@ -38,8 +37,8 @@ connection_pool = pool.SimpleConnectionPool(
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'la;sdjfaowiherojiqwke208935uijrklnwfd80ujioo23'
-
 login_manager = LoginManager(app)
+
 
 class User(UserMixin):
     def __init__(self, user_id, first_name, last_name, username, email):
@@ -133,7 +132,7 @@ def dashboard():
                 ) 
 
 
-            cur.execute(get_party(user_id))
+            cur.execute(get_party(), (user_id, ))
             parties_list = cur.fetchall()
 
             parties = []
@@ -142,7 +141,8 @@ def dashboard():
                     {
                         'party_id': party[0],
                         'name': party[1],
-                        'accept': party[2]
+                        'accept': party[2],
+                        'administrator': party[3]
                     }
                 )
 
@@ -150,12 +150,52 @@ def dashboard():
     return render_template('dashboard.html', favorite_songs=favorite_songs, parties=parties)
 
 
+@app.route('/visit-dashboard/<int:user_id>')
+def visit_dashboard(user_id):
+    with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port='5433') as conn:
+        with conn.cursor() as cur:
+            cur.execute(get_username(), (user_id, ))
+            username = cur.fetchone()[0]
+
+            cur.execute(get_favorites(user_id))
+            favorite_songs_list = cur.fetchall()
+
+            favorite_songs = []
+            for song in favorite_songs_list:
+                favorite_songs.append(
+                        {
+                        'song_id': song[0],
+                        'title': song[1],
+                        'artist': song[2],
+                        'img': song[3]
+                    }
+                ) 
+
+
+            cur.execute(get_party(), (user_id, ))
+            parties_list = cur.fetchall()
+
+            parties = []
+            for party in parties_list:
+                parties.append(
+                    {
+                        'party_id': party[0],
+                        'name': party[1],
+                        'accept': party[2],
+                        'administrator': party[3]
+                    }
+                )
+
+
+    return render_template('visit-dashboard.html', favorite_songs=favorite_songs, parties=parties, username=username)
+
+
 @app.route('/group-page/<int:party_id>')
 def group_page(party_id):
     with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port='5433') as conn:
         with conn.cursor() as cur:
             user_id = current_user.id
-            cur.execute(get_party_info(party_id, user_id), (party_id, user_id))
+            cur.execute(get_party_info(), (party_id, user_id))
             party_data = cur.fetchone()
 
             if len(party_data) == 4:
@@ -186,8 +226,21 @@ def group_page(party_id):
                     }
                 )
 
+            cur.execute(get_party_users(), (party_id, ))
+            users_list = cur.fetchall()
 
-    return render_template('group.html', info=info, songs=songs)
+            users = []
+            for user in users_list:
+                users.append(
+                    {
+                        'username': user[0],
+                        'administrator': user[1],
+                        'user_id': user[2]
+                    }
+                )
+
+
+    return render_template('group.html', info=info, songs=songs, users=users)
 
 
 @app.route('/select-group/<int:song_id>')
@@ -197,7 +250,9 @@ def select_group(song_id):
 
     with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port='5433') as conn:
         with conn.cursor() as cur:
-            cur.execute(get_party(user_id))
+            
+
+            cur.execute(get_party(), (user_id, ))
             parties_list = cur.fetchall()
 
             parties = []
@@ -206,7 +261,8 @@ def select_group(song_id):
                     {
                         'party_id': party[0],
                         'name': party[1],
-                        'accept': party[2]
+                        'accept': party[2],
+                        'administrator': party[3]
                     }
                 )
 
@@ -216,6 +272,7 @@ def select_group(song_id):
             Song = namedtuple('Song', song_page_table_user)
             cur.execute(song_page_sql)
             info = [Song(*row) for row in cur.fetchall()][0]
+            
 
     return render_template('select-group.html', parties=parties, info=info)
 
@@ -225,8 +282,49 @@ def select_group(song_id):
 def connect_group_song(party_id, song_id):
     with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port='5433') as conn:
         with conn.cursor() as cur:
-            cur.execute(insert_party_song(party_id, song_id))
+            cur.execute(insert_party_song(), (party_id, song_id))
             conn.commit()
+
+    return redirect(url_for('group_page', party_id=party_id))
+
+
+@app.route('/make-user-group-admin/<int:party_id>/<int:user_id>')
+def make_user_group_admin(party_id, user_id):
+    with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port='5433') as conn:
+        with conn.cursor() as cur:
+            cur.execute(update_user_party_admin(), (party_id, user_id))
+
+    return redirect(url_for('group_page', party_id=party_id))
+
+
+@app.route('/remove-song-from-group/<int:party_id>/<int:song_id>')
+def remove_song_from_group(party_id, song_id):
+    with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port='5433') as conn:
+        with conn.cursor() as cur:
+            user_id = current_user.id
+            cur.execute(get_party_info(), (party_id, user_id))
+            party_data = cur.fetchone()
+
+            if len(party_data) == 4:
+                info = {
+                    'party_id': party_data[0],
+                    'name': party_data[1],
+                    'description': party_data[2],
+                    'administrator': party_data[3]
+                }
+            else:
+                info = {
+                    'party_id': party_data[0],
+                    'name': party_data[1],
+                    'administrator': party_data[2]
+                }
+
+
+
+            if info['administrator']:
+                cur.execute(delete_remove_song_group(), (party_id, song_id))
+                conn.commit()
+
 
     return redirect(url_for('group_page', party_id=party_id))
 
@@ -236,7 +334,7 @@ def delete_group(party_id):
     with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port='5433') as conn:
         with conn.cursor() as cur:
             user_id = current_user.id
-            cur.execute(get_party_info(party_id, user_id), (party_id, user_id))
+            cur.execute(get_party_info(), (party_id, user_id))
             party_data = cur.fetchone()
 
             if len(party_data) == 4:
@@ -279,7 +377,7 @@ def edit_group_name(party_id):
     with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port='5433') as conn:
         with conn.cursor() as cur:
             user_id = current_user.id
-            cur.execute(get_party_info(party_id, user_id), (party_id, user_id))
+            cur.execute(get_party_info(), (party_id, user_id))
             party_data = cur.fetchone()
 
             if len(party_data) == 4:
@@ -316,7 +414,7 @@ def edit_description(party_id):
     with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port='5433') as conn:
         with conn.cursor() as cur:
             user_id = current_user.id
-            cur.execute(get_party_info(party_id, user_id), (party_id, user_id))
+            cur.execute(get_party_info(), (party_id, user_id))
             party_data = cur.fetchone()
 
             if len(party_data) == 4:
@@ -362,6 +460,7 @@ def accept_group(party_id):
 
     return redirect(url_for('dashboard'))
 
+
 @app.route('/invite-user/<int:party_id>', methods=['GET', 'POST'])
 def invite_user(party_id):
     if request.method == 'POST':
@@ -386,6 +485,7 @@ def invite_user(party_id):
         return redirect(url_for('group_page', party_id=party_id))
 
     return render_template('invite-user.html', party_id=party_id)
+
 
 @app.route('/add-favorite/<int:song_id>')
 @logged_in_only
@@ -431,7 +531,7 @@ def create_group():
                 party_id = cur.fetchone()[0]
                 user_id = current_user.id
 
-                cur.execute(insert_party_user_admin(party_id, user_id), (party_id, user_id))
+                cur.execute(insert_party_user_admin(), (party_id, user_id))
 
 
                 conn.commit()
@@ -450,7 +550,7 @@ def connect_song(song_id):
     
     with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port='5433') as conn:
         with conn.cursor() as cur:
-            cur.execute(insert_user_song(user_id, song_id))
+            cur.execute(insert_user_song(), (user_id, song_id))
             conn.commit()
 
 
@@ -465,18 +565,49 @@ def song_page(song_id):
     if current_user.is_authenticated:
         user_id = current_user.id
         song_page_sql = song_page_info(song_id, user_id=user_id)
-        Song = namedtuple('Song', song_page_table_user)
         cur.execute(song_page_sql)
-        info = [Song(*row) for row in cur.fetchall()][0]
+        song_list = cur.fetchone()
+        
+        
+        info = {
+            'song_id': song_list[0],
+            'title': song_list[1],
+            'artist': song_list[2],
+            'lyric_check': song_list[3],
+            'tab_check': song_list[4],
+            'mp3_check': song_list[5],
+            'karaoke_check': song_list[6],
+            'lyric_url': song_list[7],
+            'tab_url': song_list[8],
+            'mp3_url': song_list[9],
+            'karaoke_url': song_list[10],
+            'img_url': song_list[11],
+            'favorite_check': song_list[12]
+        }
+        
     else:
         song_page_sql = song_page_info(song_id)
-        Song = namedtuple('Song', song_page_table)
         cur.execute(song_page_sql)
-        info = [Song(*row) for row in cur.fetchall()][0]
+        song_list = cur.fetchone()
+
+        info = {
+            'song_id': song_list[0],
+            'title': song_list[1],
+            'artist': song_list[2],
+            'lyric_check': song_list[3],
+            'tab_check': song_list[4],
+            'mp3_check': song_list[5],
+            'karaoke_check': song_list[6],
+            'lyric_url': song_list[7],
+            'tab_url': song_list[8],
+            'mp3_url': song_list[9],
+            'karaoke_url': song_list[10],
+            'img_url': song_list[11]
+        }
     
 
-    if info.lyric_url:
-        with open(f'{info.lyric_url}', 'r') as file:
+    if info['lyric_url']:
+        with open(f'{info["lyric_url"]}', 'r') as file:
             lyrics = file.read().splitlines()
     else:
         lyrics = None

@@ -356,22 +356,22 @@ def insert_create_group(name, **kwargs):
                 '''
     
 
-def insert_party_user_admin(party_id, user_id):
+def insert_party_user_admin():
     return '''
             INSERT INTO party_user(party_id, user_id, accept, administrator)
             VALUES (%s, %s, true, true);
             '''
 
-def get_party(user_id):
-    return f'''
-            SELECT party_user.party_id, party.name, party_user.accept FROM party_user
+def get_party():
+    return '''
+            SELECT party_user.party_id, party.name, party_user.accept, party_user.administrator FROM party_user
             INNER JOIN party ON party.party_id = party_user.party_id
-            WHERE party_user.user_id = {user_id};
+            WHERE party_user.user_id = %s;
             '''
 
 
-def get_party_info(party_id, user_id):
-    return f'''
+def get_party_info():
+    return '''
             SELECT party.party_id, party.name, party.description, party_user.administrator
             FROM party
             INNER JOIN party_user ON party_user.party_id = party.party_id
@@ -394,12 +394,12 @@ def get_party_songs(party_id):
             '''
 
 
-def insert_party_song(party_id, song_id):
+def insert_party_song():
     return f'''
             INSERT INTO party_song(party_id, song_id)
             VALUES(
-                {party_id},
-                {song_id}
+                %s,
+                %s
             );
             '''
 
@@ -456,4 +456,33 @@ def update_accept_group():
     return '''
             UPDATE party_user SET accept = true
             WHERE user_id = %s AND party_id = %s;
+            '''
+
+
+def delete_remove_song_group():
+    return '''
+            DELETE FROM party_song
+            WHERE party_id = %s AND song_id = %s;
+            '''
+
+
+def get_party_users():
+    return '''
+            SELECT users.username, party_user.administrator, users.user_id FROM party_user
+            INNER JOIN users ON users.user_id = party_user.user_id
+            WHERE party_id = %s;
+            '''
+
+
+def update_user_party_admin():
+    return '''
+            UPDATE party_user SET administrator = true
+            WHERE party_id = %s AND user_id = %s;
+            '''
+
+
+def get_username():
+    return '''
+            SELECT username FROM users
+            WHERE user_id = %s;
             '''

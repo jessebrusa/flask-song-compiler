@@ -8,10 +8,12 @@
 </head>
 <body class="library-body">
     {% include 'header.html' %}
-        <h1>Select What Group You Want To Add</h1>
+        <h1>Select What Group You Want To Add To</h1>
         <h2 class="selectGrouph2">{{ info.title }}</h2>
     {% for party in parties %}
-        <a href="{{ url_for('connect_group_song', party_id=party.party_id, song_id=info.song_id) }}" class="selectGroup">{{ party.name }}</a>
+        {% if party.administrator %}
+            <a href="{{ url_for('connect_group_song', party_id=party.party_id, song_id=info.song_id) }}" class="selectGroup">{{ party.name }}</a>
+        {% endif %}
     {% endfor %}
     {% include 'footer.html' %}
 </body>

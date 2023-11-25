@@ -53,7 +53,7 @@ h1 {
     background-color: #a0a088;
     border: 2px solid white;
     padding: 30px;
-    font-size: 35px;
+    font-size: 32px;
     border-radius: 25px;
     font-weight: 800;
     font-family: 'cabin';
@@ -62,6 +62,10 @@ h1 {
     width: 250px;
     text-align: center;
     scale: .8;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .navBar > a:hover {
@@ -205,6 +209,11 @@ h1 {
     gap: 25px;
 }
 
+.music-card h2 {
+    text-align: center;
+}
+
+
 .music-card:hover {
     transform: scale(1.1);
 }
@@ -222,14 +231,24 @@ h1 {
     font-family: 'cabin';
     color: black;
     margin: 0;
+    text-align: center;
 }
 
 .music-card img {
     width: 200px;
     height: auto;
     max-height: 200px;
+    display: flex;
+    justify-content: center;
 }
 
+
+.musicCardRemoveContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 25px;
+}
 
 .musicCardAdd {
     display: flex;
@@ -237,6 +256,24 @@ h1 {
     justify-content: center;
     align-items: center;
     gap: 5px;
+}
+
+.removeSong {
+    text-decoration: none;
+    color: white;
+    background-color: darkred;
+    width: 95%;
+    text-align: center;
+    padding: 5px;
+    border-radius: 20px;
+}
+
+.removeSong:hover {
+    transform: scale(1.15);
+}
+
+.removeSong:active {
+    transform: scale(.85)
 }
 
 .addLink {
@@ -873,6 +910,70 @@ label {
 
 .flex5 {
     flex: 5;
+}
+
+.groupBodyContainer {
+    display: flex;
+    justify-content: flex-start;
+    margin: 40px;
+    width: 95%;
+}
+
+.groupUsersContainer {
+    background-color: #352a23;
+    color: black;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    font-size: 25px;
+    border-radius: 20px;
+    gap: 10px;
+    flex: 1;
+}
+
+.groupUsersContainer  h2{
+    color: white;
+}
+
+.userSideBar {
+    background-color: #9d9394;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 85%;
+    border-radius: 20px;
+    padding: 5px;
+    flex: 1;
+}
+
+.groupUsersContainer h2 {
+    padding: 10px;
+}
+
+.userSideBar a {
+    text-decoration: none;
+    padding: 5px;
+    border-radius: 20px;
+    color: black;
+}
+
+.adminUser {
+    background-color: #a0a088;
+    margin-top: -20px;
+}
+
+.userSideBar a:hover {
+    transform: scale(1.15);
+}
+
+.userSideBar a:active {
+    transform: scale(.85);
+}
+
+.musicCardBody {
+    display: flex;
 }
 
 @media screen and (max-width: 1500px) {
