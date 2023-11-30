@@ -30,7 +30,7 @@
             {% if parties %}
                 {% for party in parties %}
                     {% if party.accept %}
-                        <a href="{{ url_for('group_page', party_id=party.party_id) }}" class="partyCardA">
+                        <a href="{{ url_for('visit_group_page', party_id=party.party_id) }}" class="partyCardA">
                             <div class="partyCard">
                                 <h3>{{ party.name }}</h3>
                             </div>

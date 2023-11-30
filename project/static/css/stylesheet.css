@@ -698,6 +698,7 @@ label {
     margin: 50px;
     text-align: center;
     font-size: 50px;
+    font-family: 'Roboto', sans-serif;
 }
 
 .deleteButton:hover {
@@ -848,6 +849,18 @@ label {
     background-color: darkred;
     color: white;
     flex: 1;
+    font-family: 'Roboto', sans-serif;
+    font-size: 35px;
+    border-radius: 20px;
+    padding: 10px;
+}
+
+.deleteGroup:hover {
+    transform: scale(1.15);
+}
+
+.deleteGroup:active {
+    transform: scale(.85)
 }
 
 .editP {
@@ -915,6 +928,14 @@ label {
 .groupBodyContainer {
     display: flex;
     justify-content: flex-start;
+    flex-wrap: wrap;
+    margin: 40px;
+    width: 95%;
+}
+
+.groupBodyContainerVisit {
+    display: flex;
+    justify-content: center;
     margin: 40px;
     width: 95%;
 }
@@ -945,12 +966,8 @@ label {
     width: 85%;
     border-radius: 20px;
     padding: 5px;
-    flex: 1;
 }
 
-.groupUsersContainer h2 {
-    padding: 10px;
-}
 
 .userSideBar a {
     text-decoration: none;
@@ -976,6 +993,68 @@ label {
     display: flex;
 }
 
+#confirmContainer {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: rgba(0, 0, 0, 0.8); /* Semi-transparent black background */
+    padding: 20px;
+    border-radius: 10px;
+    z-index: 1000; /* Ensure it's above other elements */
+    color: white;
+    width: 50%;
+    padding: 10px;
+}
+
+.linkContainer {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    font-size: 45px;
+    padding: 10px;
+    width: 40%;
+    gap: 25px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.removeYes {
+    flex: 1;
+    text-decoration: none;
+    background: white;
+    padding: 10px;
+    border-radius: 20px;
+    color: darkgreen;
+    text-align: center;
+}
+
+.removeNo {
+    flex: 1;
+    font-size: 45px;
+    background-color: darkred;
+    padding: 10px;
+    border-radius: 20px;
+    font-family: 'Roboto', sans-serif;
+    color: white;
+}
+
+.removeYes:hover {
+    transform: scale(1.15)
+}
+
+.removeYes:active {
+    transform: scale(.85);
+}
+
+.removeNo:hover {
+    transform: scale(1.15)
+}
+
+.removeNo:active {
+    transform: scale(.85);
+}
+
 @media screen and (max-width: 1500px) {
     .hero-container {
         flex-direction: column;
@@ -996,6 +1075,17 @@ label {
     .submitButton {
         scale: .7;
         font-size: 20px;
+    }
+
+    .groupUsersContainer {
+        flex: none;
+        width: 80%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .footer {
+        width: 80%;
     }
 }
 

@@ -379,8 +379,16 @@ def get_party_info():
             '''
 
 
-def get_party_songs(party_id):
-    return f'''
+def get_party_info_visit():
+    return '''
+            SELECT party_id, name, description
+            FROM party
+            WHERE party.party_id = %s;           
+            '''
+
+
+def get_party_songs():
+    return '''
             SELECT 
                 song.song_id,
                 song.title,
@@ -390,7 +398,8 @@ def get_party_songs(party_id):
             INNER JOIN party_song ON party_song.party_id = party.party_id
             INNER JOIN song ON song.song_id = party_song.song_id
             INNER JOIN url ON song.song_id = url.song_id
-            WHERE party.party_id = {party_id};
+            WHERE party.party_id = %s
+            ORDER BY song.title;
             '''
 
 
@@ -485,4 +494,11 @@ def get_username():
     return '''
             SELECT username FROM users
             WHERE user_id = %s;
+            '''
+
+
+def remove_user_song():
+    return '''
+            DELETE FROM user_song
+            WHERE user_id = %s AND song_id = %s;
             '''
