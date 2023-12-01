@@ -76,6 +76,12 @@ def song_page_info(song_id, **kwargs):
 get_title_artist_table = ['song_id', 'title', 'artist']
 
 
+def user_song_library():
+    return '''
+            SELECT song_id FROM user_song
+            WHERE user_id = %s AND song_id = %s
+            '''
+
 def get_title_artist_query(song_id):
     return f'''
             SELECT song_id, title, artist FROM song

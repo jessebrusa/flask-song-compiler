@@ -603,26 +603,49 @@ def song_page(song_id):
 
     if current_user.is_authenticated:
         user_id = current_user.id
-        song_page_sql = song_page_info(song_id, user_id=user_id)
-        cur.execute(song_page_sql)
-        song_list = cur.fetchone()
-        
-        
-        info = {
-            'song_id': song_list[0],
-            'title': song_list[1],
-            'artist': song_list[2],
-            'lyric_check': song_list[3],
-            'tab_check': song_list[4],
-            'mp3_check': song_list[5],
-            'karaoke_check': song_list[6],
-            'lyric_url': song_list[7],
-            'tab_url': song_list[8],
-            'mp3_url': song_list[9],
-            'karaoke_url': song_list[10],
-            'img_url': song_list[11],
-            'favorite_check': song_list[12]
-        }
+
+        cur.execute(user_song_library(), (user_id, song_id))
+        song_in_library = cur.fetchone()
+
+        if song_in_library:
+            song_page_sql = song_page_info(song_id, user_id=user_id)
+            cur.execute(song_page_sql)
+            song_list = cur.fetchone()
+            
+            info = {
+                'song_id': song_list[0],
+                'title': song_list[1],
+                'artist': song_list[2],
+                'lyric_check': song_list[3],
+                'tab_check': song_list[4],
+                'mp3_check': song_list[5],
+                'karaoke_check': song_list[6],
+                'lyric_url': song_list[7],
+                'tab_url': song_list[8],
+                'mp3_url': song_list[9],
+                'karaoke_url': song_list[10],
+                'img_url': song_list[11],
+                'favorite_check': song_list[12]
+            }
+        else:
+            song_page_sql = song_page_info(song_id)
+            cur.execute(song_page_sql)
+            song_list = cur.fetchone()
+
+            info = {
+                'song_id': song_list[0],
+                'title': song_list[1],
+                'artist': song_list[2],
+                'lyric_check': song_list[3],
+                'tab_check': song_list[4],
+                'mp3_check': song_list[5],
+                'karaoke_check': song_list[6],
+                'lyric_url': song_list[7],
+                'tab_url': song_list[8],
+                'mp3_url': song_list[9],
+                'karaoke_url': song_list[10],
+                'img_url': song_list[11]
+            }
         
     else:
         song_page_sql = song_page_info(song_id)
@@ -747,11 +770,12 @@ def find_song():
 #########################################################################################################
 
         if compare_searches_song_id:
+            print('search term is a match')
             song_id = compare_searches_song_id[0]
 
             with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num) as conn:
                 with conn.cursor() as cur:
-                    cur.execute(insert_user_song(user_id, song_id))
+                    cur.execute(insert_user_song(), (user_id, song_id))
                     conn.commit()
 
             redirect_url = url_for('song_page', song_id=song_id)
@@ -787,6 +811,7 @@ def find_song():
 
  #########################################################################################################           
             if compare_searches_song_id:
+                print('proper term is a match')
                 new_search_term_sql = update_value(song_id, 'searches', 'search_term', input_title)
                 cur.execute(new_search_term_sql)
                 conn.commit()
