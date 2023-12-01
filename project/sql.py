@@ -2,7 +2,7 @@ library_table = ['song_id', 'title', 'artist', 'img_url']
 
 
 def library_songs(user_id):
-    return f'''SELECT 
+    return f'''SELECT DISTINCT
                     song.song_id, 
                     title, artist, 
                     url.img_url 
@@ -14,13 +14,18 @@ def library_songs(user_id):
 
 
 def catalogue_songs():
-    return '''SELECT 
-                    song.song_id, 
-                    title, artist, 
-                    url.img_url 
-                FROM song
-                INNER JOIN url ON song.song_id = url.song_id
-                ORDER BY title;'''
+    return '''
+            SELECT 
+                song.song_id, 
+                song.title, 
+                song.artist, 
+                url.img_url
+            FROM song
+            INNER JOIN url ON song.song_id = url.song_id
+            LEFT JOIN user_song ON song.song_id = user_song.song_id AND user_song.user_id = 1
+            WHERE user_song.user_id IS NULL
+            ORDER BY song.title;
+        '''
 
 song_page_table_user = ['song_id', 'title', 'artist',
                    'lyric_check', 'tab_check', 'mp3_check', 'karaoke_check',
@@ -286,15 +291,18 @@ def insert_new_user(f_name, l_name, username, email, password):
             )
             '''
 
-def get_user(email):
-    if "'" in email:
-        email = email.replace("'", "''")
-
-    return f'''
-            SELECT user_id, first_name, last_name, email, password, username FROM users
-            WHERE email = '{email}'
+def get_user():
+    return '''
+            SELECT user_id, first_name, last_name, email, password, username, site_admin FROM users
+            WHERE email = %s
             '''
 
+
+def check_site_admin():
+    return '''
+            SELECT site_admin FROM users
+            WHERE user_id = %s;
+            '''
 
 
 user_table = ['user_id', 'email', 'password']

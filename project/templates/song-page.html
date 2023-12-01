@@ -84,10 +84,13 @@
             </div>    
         </a>
     {% endif %}
-    {% if current_user.is_authenticated %}
+    {% if current_user.is_authenticated and song_in_library %}
         <button class="deleteButton", id="remove", data-song-id="{{ info.song_id }}">
             REMOVE From Your Library
         </button>
+    {% endif %}
+    {% if site_admin %}
+        <p style="color: white;">SITE ADMIN</p>
     {% endif %}
     {% include 'footer.html' %}
     <script src="../static/js/main.js"></script>

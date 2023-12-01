@@ -41,12 +41,13 @@ login_manager = LoginManager(app)
 
 
 class User(UserMixin):
-    def __init__(self, user_id, first_name, last_name, username, email):
+    def __init__(self, user_id, first_name, last_name, username, email, site_admin):
         self.id = user_id
         self.first_name = first_name
         self.last_name = last_name
         self.username = username
         self.email = email
+        self.site_admin = site_admin
 
 
 @login_manager.user_loader
@@ -57,7 +58,8 @@ def load_user(user_id):
             user_data = cursor.fetchone()
 
             if user_data:
-                user = User(user_data[0], user_data[1], user_data[2], user_data[5], user_data[3])
+                user = User(user_data[0], user_data[1], user_data[2], 
+                            user_data[5], user_data[3], user_data[4])
                 return user
             else:
                 return None
@@ -103,10 +105,17 @@ def library():
 def catalogue():
     with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num) as conn:
         with conn.cursor() as cur:
-            songs_sql = catalogue_songs()
-            Song = namedtuple('Song', library_table)
-            cur.execute(songs_sql)
-            songs = [Song(*row) for row in cur.fetchall()]
+            if current_user.is_authenticated:
+                user_id = current_user.id
+
+                Song = namedtuple('Song', library_table)
+                cur.execute(catalogue_songs(), (user_id, ))
+                songs = [Song(*row) for row in cur.fetchall()]
+
+            else:
+                Song = namedtuple('Song', library_table)
+                cur.execute(catalogue_songs(), (0, ))
+                songs = [Song(*row) for row in cur.fetchall()]
 
     return render_template('catalogue.html', songs=songs)
 
@@ -600,9 +609,12 @@ def connect_song(song_id):
 def song_page(song_id):
     conn = pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num)
     cur = conn.cursor()
+    song_in_library = None
 
     if current_user.is_authenticated:
         user_id = current_user.id
+        cur.execute(check_site_admin(), (user_id, ))
+        site_admin = cur.fetchone()[0]
 
         cur.execute(user_song_library(), (user_id, song_id))
         song_in_library = cur.fetchone()
@@ -676,7 +688,8 @@ def song_page(song_id):
 
     conn.close()
  
-    return render_template('song-page.html', info=info, lyrics=lyrics)
+    return render_template('song-page.html', info=info, lyrics=lyrics, song_in_library=song_in_library,
+                           site_admin=site_admin)
 
 
 @app.route('/mp3/<int:song_id>')
@@ -997,7 +1010,7 @@ def login_page():
 
         try:
             with conn.cursor() as cur:
-                cur.execute(get_user(email))
+                cur.execute(get_user(), (email, ))
                 user = cur.fetchone()
 
             if user:
@@ -1008,6 +1021,7 @@ def login_page():
                     'email': user[3],
                     'password': user[4],
                     'username': user[5],
+                    'site_admin': user[6]
                 }
             
             password_true = check_password_hash(user_dict['password'], password_input)
@@ -1016,7 +1030,7 @@ def login_page():
                 session['user_id'] = user_dict['user_id']
 
                 user_object = User(user_dict['user_id'], user_dict['first_name'], user_dict['username'],
-                                   user_dict['last_name'], user_dict['email'])
+                                   user_dict['last_name'], user_dict['email'], user_dict['site_admin'])
 
 
                 login_user(user_object)
