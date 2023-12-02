@@ -131,15 +131,13 @@ def get_title_query(song_id):
             WHERE song_id = {song_id}'''
 
 
-def query_search_terms(search):
-    if "'" in search:
-        search = search.replace("'", "''")
-    return f'''
+def query_search_terms():
+    return '''
             SELECT song.song_id FROM searches
             INNER JOIN song_search ON searches.search_id = song_search.search_id
             INNER JOIN song ON song_search.song_id = song.song_id
-            WHERE search_term ILIKE '{search}'
-            GROUP BY song.song_id
+            WHERE search_term ILIKE %s
+            GROUP BY song.song_id;
             '''
 
 

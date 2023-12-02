@@ -778,13 +778,11 @@ def find_song():
 
         user_id = current_user.id
 #########################################################################################################
-        compare_searches_query = query_search_terms(input_title)
-        cur.execute(compare_searches_query)
+        cur.execute(query_search_terms(), (input_title, ))
         compare_searches_song_id = cur.fetchone()
 #########################################################################################################
 
         if compare_searches_song_id:
-            print('search term is a match')
             song_id = compare_searches_song_id[0]
 
             with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num) as conn:
@@ -819,17 +817,14 @@ def find_song():
 
 #########################################################################################################      
       
-            compare_searches_query = query_search_terms(title)
-            cur.execute(compare_searches_query)
+            cur.execute(query_search_terms(), (title, ))
             compare_searches_song_id = cur.fetchone()
 
  #########################################################################################################           
             if compare_searches_song_id:
-                print('proper term is a match')
                 new_search_term_sql = update_value(song_id, 'searches', 'search_term', input_title)
                 cur.execute(new_search_term_sql)
                 conn.commit()
-                #Connect User to song
 
                 with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num) as conn:
                     with conn.cursor() as cur:
@@ -963,7 +958,7 @@ def delete_song(song_id):
             except FileNotFoundError:
                 print('Mp3 file not found')
             except Exception as e:
-                print(f'An error occured {e}')
+                print(f'An error occurred {e}')
 
             try:
                 if info['karaoke_url']:
@@ -971,7 +966,7 @@ def delete_song(song_id):
             except FileNotFoundError:
                 print('Karaoke file not found')
             except Exception as e:
-                print(f'An error occured {e}')
+                print(f'An error occurred {e}')
 
             try:
                 if info['lyric_url']:
@@ -979,7 +974,7 @@ def delete_song(song_id):
             except FileNotFoundError:
                 print('Lyric file not found')
             except Exception as e:
-                print(f'An error occured {e}')
+                print(f'An error occurred {e}')
 
             try:
                 if info['tab_url']:
@@ -987,7 +982,7 @@ def delete_song(song_id):
             except FileNotFoundError:
                 print('Tab file not found')
             except Exception as e:
-                print(f'An error occured {e}')
+                print(f'An error occurred {e}')
 
 
             cur.execute(get_all_search_id(), (song_id, ))
