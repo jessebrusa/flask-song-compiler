@@ -27,6 +27,18 @@ def catalogue_songs():
             ORDER BY song.title;
         '''
 
+def all_catalogue_songs():
+    return '''
+            SELECT 
+                song.song_id,
+                song.title,
+                song.artist,
+                url.img_url
+            FROM song
+            INNER JOIN url ON song.song_id = url.song_id
+            ORDER BY song.title;
+            '''
+
 song_page_table_user = ['song_id', 'title', 'artist',
                    'lyric_check', 'tab_check', 'mp3_check', 'karaoke_check',
                    'lyric_url', 'tab_url', 'mp3_url', 'karaoke_url', 'img_url', 'favorite_check']

@@ -114,7 +114,7 @@ def catalogue():
 
             else:
                 Song = namedtuple('Song', library_table)
-                cur.execute(catalogue_songs(), (0, ))
+                cur.execute(all_catalogue_songs())
                 songs = [Song(*row) for row in cur.fetchall()]
 
     return render_template('catalogue.html', songs=songs)
@@ -610,6 +610,7 @@ def song_page(song_id):
     conn = pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num)
     cur = conn.cursor()
     song_in_library = None
+    site_admin = None
 
     if current_user.is_authenticated:
         user_id = current_user.id
@@ -1058,4 +1059,4 @@ def logout():
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5001)
+    app.run(debug=True, port=5001, host='0.0.0.0')

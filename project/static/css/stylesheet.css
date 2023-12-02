@@ -4,11 +4,13 @@
     border: 2px solid red;
 } */
 
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
 body {
-    background-image: url("../img/acoustic-guitar.jpeg");
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    background-position: center center;
     background-color: black;
     min-height: 100vh;
     display: flex;
@@ -16,6 +18,17 @@ body {
     justify-content: space-between;
     align-items: center;
     font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+.homePage {
+    background-image: url("../img/acoustic-guitar.jpeg");
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center center;
+    background-size: 60% auto;
 }
 
 h1 {
@@ -47,7 +60,7 @@ h1 {
     width: 90%;
 }
 
-.navBar > a {
+.navBar  a {
     text-decoration: none;
     color: #352a23;
     background-color: #a0a088;
@@ -62,10 +75,11 @@ h1 {
     width: 250px;
     text-align: center;
     scale: .8;
-    height: 40px;
     display: flex;
     justify-content: center;
     align-items: center;
+    min-width: 200px;
+    height: 100px;
 }
 
 .navBar > a:hover {
@@ -77,7 +91,7 @@ h1 {
     transform: scale(.85);
 }
 
-.homePage {
+.homePageNav {
     width: 40%;
     display: flex;
     flex-wrap: wrap;
@@ -86,15 +100,12 @@ h1 {
     border-radius: 20px;
 }
 
-.registerLogin {
-    margin-top: 75px;
-}
-
 .submitButton {
     width: 40%;
     font-size: 45px;
     padding: 20px;
     border-radius: 20px;
+    min-width: 200px;
 }
 
 .submitButton:hover {
@@ -116,12 +127,13 @@ h1 {
 .footer {
     background-color: #e5ba88;
     display: flex;
+    flex-wrap: wrap;
     width: 100%;
     justify-content: space-between;
     color: #352a23;
     padding-left: 10px;
     padding-right: 10px;
-    font-size: 15px;
+    font-size: 25px;
     font-family: 'cabin';
     box-sizing: border-box;
     margin-top: 40px;
@@ -192,7 +204,6 @@ h1 {
     flex-wrap: wrap;
     width: 80%;
     gap: 50px;
-    margin: 50px;
 }
 
 .music-card {
@@ -436,8 +447,17 @@ h1 {
 
 .find-song-body {
     background-image: none;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
 }
 
+.centerVertically {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
 
 .textCenter {
     text-align: center;
@@ -526,6 +546,7 @@ label {
     font-size: 50px;
     height: 60px;
     border-radius: 20px;
+    min-width: 200px;
 }
 
 .searchSubmit {
@@ -546,6 +567,7 @@ label {
 .rowItems {
     width: 100%;
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: 10px;
 }
@@ -1055,6 +1077,10 @@ label {
     transform: scale(.85);
 }
 
+.displayMobile {
+    display: none;
+}
+
 @media screen and (max-width: 1500px) {
     .hero-container {
         flex-direction: column;
@@ -1085,7 +1111,62 @@ label {
     }
 
     .footer {
-        width: 80%;
+        justify-content: center;
+    }
+
+    .searchInput {
+        font-size: 15px;
+    }
+
+    .displayComp {
+        display: none;
+    }
+
+    .displayMobile {
+        display: block;
+    }
+
+    .musicCardAdd {
+        min-width: 360px;
+        width: 100%;
+        gap: 5px;
+    }
+
+    .music-card-container {
+        min-width: 360px;
+        width: 100%;
+        gap: 15px;
+    }
+
+    .addLink {
+        margin: 5px;
+    }
+
+    .sideCard {
+        width: 100%;
+    }
+
+    .sideCardHeight {
+        min-height: 200px;
+        margin: 5px 15px;
+    }
+
+    .sideCardTitleArtist {
+        text-align: center;
+        margin-right: 5px;
+    }
+
+    .sideCardTitleArtist h3 {
+        font-size: 25px;
+    }
+
+    .sideCardTitleArtist h4 {
+        font-size: 18px;
+    }
+
+    .sideCard img {
+        width: 25%;
+        margin-left: 5px;
     }
 }
 
@@ -1095,6 +1176,6 @@ label {
     }
 
     .library-body > img {
-        display: none;
+        display: block;
     }
 }

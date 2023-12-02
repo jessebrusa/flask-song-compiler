@@ -12,12 +12,23 @@
         <div class="music-card-container">
             {% for song in songs %}
                 <div class="musicCardAdd">
-                    <a href="{{ url_for('song_page', song_id=song.song_id) }}">
+                    <a href="{{ url_for('song_page', song_id=song.song_id) }}" class="displayComp">
                         <div class="music-card">
-                            <h2>{{ song.title }}</h2>
-                            <h3>{{ song.artist }}</h3>
+                            <div class="catalogueTitleArtist">
+                                <h2>{{ song.title }}</h2>
+                                <h3>{{ song.artist }}</h3>
+                            </div>
                             <div class="img-container-library">
                                 <img src="{{ song.img_url }}" alt="picture of song and or songs artist">
+                            </div>
+                        </div>
+                    </a>
+                    <a href="{{ url_for('song_page', song_id=song.song_id) }}" class="displayMobile sideCard">
+                        <div class="favCard sideCardHeight">
+                            <img src="{{ song.img_url }}" alt="image of a artist or album cover">
+                            <div class="dashboardTitleArtist sideCardTitleArtist">
+                                <h3>{{ song.title }}</h3>
+                                <h4>{{ song.artist }}</h4>
                             </div>
                         </div>
                     </a> 
