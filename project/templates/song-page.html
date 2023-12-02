@@ -14,18 +14,31 @@
                 <a href="{{ url_for('remove_favorite', song_id=info.song_id) }}" class="songPageFavorites">Remove From Favorites</a>
                 <a href="{{ url_for('select_group', song_id=info.song_id) }}" class="songPageFavorites">Add To A Group</a>
             {% elif current_user.is_authenticated %}
-                <a href="{{ url_for('connect_song', song_id=info.song_id) }}" class="songPageFavorites">Add To Library</a>
+                <a href="{{ url_for('add_favorite', song_id=info.song_id) }}" class="songPageFavorites">Add To Favorites</a>
+                <a href="{{ url_for('select_group', song_id=info.song_id) }}" class="songPageFavorites">Add To A Group</a>
+                {% if not song_in_library %}
+                    <a href="{{ url_for('connect_song', song_id=info.song_id) }}" class="songPageFavorites">Add To Library</a>
+                {% endif %}
             {% endif %}
         </div>
         <div class="hero-text-container">
             <h1>{{ info.title }}</h1>
+            {% if site_admin %}
+                <a class="editAdminBtn" id="editTitle">EDIT TITLE</a>
+            {% endif %}
             <div class="infoBackground">
                 <h2>{{ info.artist }}</h2>     
             </div>
+            {% if site_admin %}
+                <a class="editAdminBtn">EDIT ARTIST</a>
+            {% endif %}
         </div>
         <div class="hero-img-container">
             <img src="{{ info.img_url }}" alt="picture of song and or songs artist">
         </div>
+        {% if site_admin %}
+            <a class="editAdminBtn">EDIT IMG</a>
+        {% endif %}
     </div>
     <div class="music-player">
         <div class="mp3-container">
@@ -40,6 +53,9 @@
                 </a>
             {% endif %}    
         </div>
+        {% if site_admin %}
+            <a class="editAdminBtn">EDIT MP3</a>
+        {% endif %}
         <div class="karaoke-container">
             {% if info.karaoke_check and info.karaoke_url %}  
                 <h3>Karaoke</h3>
@@ -52,6 +68,9 @@
                 </a>
             {% endif %}
         </div>
+        {% if site_admin %}
+            <a class="editAdminBtn">EDIT KARAOKE</a>
+        {% endif %}
     </div>
     {% if info.lyric_check and lyrics %}
         <div class="lyrics-container">
@@ -66,11 +85,13 @@
             <h3 class="textCenter">No Lyrics Found</h3>
         </div>
     {% endif %}
+    {% if site_admin %}
+        <a class="editAdminBtn">EDIT LYRICS</a>
+    {% endif %}
     {% if info.tab_check and info.tab_url %}
         <div class="pdf-container">
-            <object data="{{ info.tab_url }}" type="application/pdf" width="100%" height="1200px">
-                <p>It appears you don't have a PDF plugin for this browser.
-                   You can <a href="{{ info.tab_url }}">download the PDF file.</a></p>
+            <object data="{{ info.tab_url }}" type="application/pdf" width="100%" height="1200px" class="noPdfContainer">
+                <a href="{{ info.tab_url }}" class="downloadPDF">You don't have the right pdf plugin.</a>
             </object>
         </div>
     {% elif info.tab_check %}
@@ -84,22 +105,36 @@
             </div>    
         </a>
     {% endif %}
+    {% if site_admin %}
+        <a class="editAdminBtn">EDIT TABS</a>
+    {% endif %}
     {% if current_user.is_authenticated and song_in_library %}
         <button class="deleteButton", id="remove", data-song-id="{{ info.song_id }}">
             REMOVE From Your Library
         </button>
     {% endif %}
     {% if site_admin %}
-        <p style="color: white;">SITE ADMIN</p>
+        <button class="deleteButton" id="delete" data-song-id="{{ info.song_id }}">
+            FULL DELETE
+        </button>
     {% endif %}
     {% include 'footer.html' %}
     <script src="../static/js/main.js"></script>
-    <script>
-        var removeButton = document.getElementById('remove')
+    <script>   
+        var removeButton = document.getElementById('remove') 
         var songId = removeButton.getAttribute('data-song-id')
         removeButton.addEventListener('click', function () {
-            createConfirmationDialog('Are you sure you want to remove this song from your library?', 'remove-song/' + songId, 'remove')
+            createConfirmationDialog('Are you sure you want to remove this song from your library?', 
+            'remove-song/' + songId, 'remove')
         })
+
+        var deleteButton = document.getElementById('delete')
+        var songId = deleteButton.getAttribute('data-song-id')
+        deleteButton.addEventListener('click', function () {
+            createConfirmationDialog('Are you sure you want to delete this song and its assets',
+            'delete-song/' + songId, 'delete')
+        })
+
     </script>
 </body>
 </html>

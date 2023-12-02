@@ -58,6 +58,17 @@
                     </div>
                 {% endfor %}
             </div>
+            {% for song in songs %}
+                <a href="{{ url_for('song_page', song_id=song.song_id) }}" class="displayMobile sideCard">
+                    <div class="favCard sideCardHeight">
+                        <img src="{{ song.img_url }}" alt="image of a artist or album cover">
+                        <div class="dashboardTitleArtist sideCardTitleArtist">
+                            <h3>{{ song.title }}</h3>
+                            <h4>{{ song.artist }}</h4>
+                        </div>
+                    </div>
+                </a> 
+            {% endfor %}
         </div>
         {% if info.administrator %}
             <div class="adminOptionsContainer">
@@ -72,7 +83,6 @@
                 <button class="deleteGroup" id="remove" data-party-id="{{ info.party_id }}">LEAVE GROUP</button>
             </div>
         {% endif %}
-    </div>
     {% include 'footer.html' %} 
     <script src="../static/js/main.js"></script>
     <script>

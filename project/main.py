@@ -936,20 +936,73 @@ def remove_song(song_id):
 
 @app.route('/delete-song/<int:song_id>')
 def delete_song(song_id):
-    conn = pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num)
-    cur = conn.cursor()
+    with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num) as conn:
+        with conn.cursor() as cur:
+            song_page_sql = song_page_info(song_id)
+            cur.execute(song_page_sql)
+            song_list = cur.fetchone()
 
-    cur.execute(get_all_search_id(song_id))
-    all_search_id = cur.fetchall()
-    print(all_search_id)
-    for search_id in all_search_id:
-        cur.execute(delete_search_id(search_id[0]))
-        conn.commit()
+            info = {
+                'song_id': song_list[0],
+                'title': song_list[1],
+                'artist': song_list[2],
+                'lyric_check': song_list[3],
+                'tab_check': song_list[4],
+                'mp3_check': song_list[5],
+                'karaoke_check': song_list[6],
+                'lyric_url': song_list[7],
+                'tab_url': song_list[8],
+                'mp3_url': song_list[9],
+                'karaoke_url': song_list[10],
+                'img_url': song_list[11]
+            }
 
-    delete_sql = delete_song(song_id)
-    cur.execute(delete_sql)
-    conn.commit()
-    conn.close()
+            try:
+                if info['mp3_url']:
+                    os.remove(info['mp3_url'][1:])
+            except FileNotFoundError:
+                print('Mp3 file not found')
+            except Exception as e:
+                print(f'An error occured {e}')
+
+            try:
+                if info['karaoke_url']:
+                    os.remove(info['karaoke_url'][1:])
+            except FileNotFoundError:
+                print('Karaoke file not found')
+            except Exception as e:
+                print(f'An error occured {e}')
+
+            try:
+                if info['lyric_url']:
+                    os.remove(info['lyric_url'])
+            except FileNotFoundError:
+                print('Lyric file not found')
+            except Exception as e:
+                print(f'An error occured {e}')
+
+            try:
+                if info['tab_url']:
+                    os.remove(info['tab_url'][1:])
+            except FileNotFoundError:
+                print('Tab file not found')
+            except Exception as e:
+                print(f'An error occured {e}')
+
+
+            cur.execute(get_all_search_id(), (song_id, ))
+            all_search_id = cur.fetchall()
+
+            for search_id in all_search_id:
+                cur.execute(delete_search_id(), (search_id, search_id))
+
+            cur.execute(delete_party_song(), (song_id, ))
+
+            cur.execute(delete_song_db(), (song_id, song_id, song_id, 
+                                        song_id, song_id))
+
+            conn.commit()
+
 
     return redirect(url_for('library'))
 

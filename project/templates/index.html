@@ -8,7 +8,7 @@
 </head>
 <body class="homePage">
     <h1>Welcome to the Song Compiler App</h1>
-    <div class="navBar homePageNav">
+    <div class="homePageGrey homePageNav">
         {% if not current_user.is_authenticated %}
             <a href="{{ url_for('catalogue') }}">Catalogue</a>
             <a href="{{ url_for('login_page')}}">login</a>

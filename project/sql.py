@@ -179,19 +179,22 @@ def update_value(song_id, table, field, value):
             '''
 
 
-def delete_song(song_id):
-    return f'''
+def delete_song_db():
+    return '''
             DELETE FROM user_song
-            WHERE song_id = {song_id};
+            WHERE song_id = %s;
 
             DELETE FROM url
-            WHERE song_id = {song_id};
+            WHERE song_id = %s;
 
             DELETE FROM attempt
-            WHERE song_id = {song_id};
+            WHERE song_id = %s;
+
+            DELETE FROM party_song
+            WHERE song_id = %s;
 
             DELETE FROM song
-            WHERE song_id = {song_id};
+            WHERE song_id = %s;
             '''
 
 
@@ -243,21 +246,28 @@ def get_search_id(search_term):
             '''
 
 
-def get_all_search_id(song_id):
-    return f'''
+def get_all_search_id():
+    return '''
             SELECT searches.search_id FROM searches
             INNER JOIN song_search ON song_search.search_id = searches.search_id
             INNER JOIN song ON song.song_id = song_search.song_id
-            WHERE song.song_id = {song_id}
+            WHERE song.song_id = %s;
             '''
 
-def delete_search_id(search_id):
-    return f'''
+def delete_search_id():
+    return '''
             DELETE FROM song_search
-            WHERE search_id = {search_id};
+            WHERE search_id = (%s);
 
             DELETE FROM searches 
-            WHERE search_id = {search_id};
+            WHERE search_id = (%s);
+            '''
+
+
+def delete_party_song():
+    return '''
+            DELETE FROM party_song
+            WHERE song_id = %s;
             '''
 
 
