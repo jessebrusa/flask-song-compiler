@@ -1081,6 +1081,14 @@ label {
     display: none;
 }
 
+.nav-container {
+    display: none;
+}
+
+.colorBlack {
+    color: black;
+}
+
 @media screen and (max-width: 1500px) {
     .hero-container {
         flex-direction: column;
@@ -1167,6 +1175,66 @@ label {
     .sideCard img {
         width: 25%;
         margin-left: 5px;
+    }
+
+    .navBar {
+        display: none;
+    }
+
+    .nav-container {
+        display: flex;
+        justify-content: space-between;
+        background-color: #9d9394;
+        padding: 10px;
+        border-radius: 20px;
+        scale: 1.2;
+    }
+
+    .nav-list {
+        list-style-type: none;
+        display: flex;
+    }
+
+
+    .nav-item {
+        margin-right: 15px;
+        position: relative;
+        color: black;
+    }
+
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: #555;
+        min-width: 160px;
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        z-index: 1;
+    }
+
+
+    .dropdown-btn {
+        background-color: inherit;
+        color: white;
+        border: none;
+        cursor: pointer;
+    }
+
+    /* Style for the links inside the dropdown */
+    .dropdown-content a {
+        color: white;
+        padding: 12px 16px;
+        text-decoration: none;
+        display: block;
+    }
+
+    /* Change color on hover */
+    .dropdown-content a:hover {
+        background-color: #777;
+    }
+
+    /* Show the dropdown content when hovering over the dropdown button */
+    .nav-item:hover .dropdown-content {
+        display: block;
     }
 }
 
