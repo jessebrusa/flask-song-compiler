@@ -54,7 +54,7 @@
             {% endif %}    
         </div>
         {% if site_admin %}
-            <a class="editAdminBtn">EDIT MP3</a>
+            <a href="{{ url_for('edit_mp3', song_id=info.song_id, title=info.title) }}" class="editAdminBtn">EDIT MP3</a>
         {% endif %}
         <div class="karaoke-container">
             {% if info.karaoke_check and info.karaoke_url %}  
@@ -69,7 +69,7 @@
             {% endif %}
         </div>
         {% if site_admin %}
-            <a class="editAdminBtn">EDIT KARAOKE</a>
+            <a href="{{ url_for('edit_karaoke', song_id=info.song_id, title=info.title) }}" class="editAdminBtn">EDIT KARAOKE</a>
         {% endif %}
     </div>
     {% if info.lyric_check and lyrics %}
@@ -86,12 +86,12 @@
         </div>
     {% endif %}
     {% if site_admin %}
-        <a class="editAdminBtn">EDIT LYRICS</a>
+        <a href="{{ url_for('edit_lyric', song_id=info.song_id, title=info.title) }}" class="editAdminBtn">EDIT LYRICS</a>
     {% endif %}
     {% if info.tab_check and info.tab_url %}
         <div class="pdf-container">
             <object data="{{ info.tab_url }}" type="application/pdf" width="100%" height="1200px" class="noPdfContainer">
-                <a href="{{ info.tab_url }}" class="downloadPDF">You don't have the right pdf plugin.</a>
+                <a href="{{ info.tab_url }}" class="downloadPDF" style="color: white;">You don't have the right pdf plugin.</a>
             </object>
         </div>
     {% elif info.tab_check %}
@@ -106,7 +106,7 @@
         </a>
     {% endif %}
     {% if site_admin %}
-        <a class="editAdminBtn">EDIT TABS</a>
+        <a href="{{ url_for('edit_tab', song_id=info.song_id, title=info.title) }}" class="editAdminBtn">EDIT TAB</a>
     {% endif %}
     {% if current_user.is_authenticated and song_in_library %}
         <button class="deleteButton", id="remove", data-song-id="{{ info.song_id }}">

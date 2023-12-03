@@ -525,7 +525,6 @@ h1 {
     text-align: center;
 }   
 
-
 .hero-text-container h2 {
     color: #352a23;
     font-size: 40px;
@@ -625,6 +624,10 @@ label {
     flex-wrap: wrap;
     align-items: center;
     gap: 10px;
+}
+
+.fileRowItems label, input {
+    font-size: 30px;
 }
 
 .item1 {
@@ -1187,6 +1190,10 @@ label {
 }
 
 @media screen and (max-width: 1500px) {
+    .hero-text-container h1 {
+        font-size: 50px;
+    }
+
     .hero-container {
         flex-direction: column;
         justify-content: center;

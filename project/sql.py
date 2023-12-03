@@ -557,3 +557,30 @@ def update_edit_img():
             UPDATE url SET img_url = %s
             WHERE song_id = %s;
             '''
+
+
+def update_edit_mp3():
+    return '''
+            UPDATE url SET mp3_url = %s
+            WHERE song_id = %s;
+            '''
+
+
+def update_edit_karaoke():
+    return '''
+            UPDATE url SET karaoke_url = %s
+            WHERE song_id = %s;
+            '''
+
+
+def update_edit_tab():
+    return '''
+            UPDATE url SET tab_url = %s
+            WHERE song_id = %s;
+            '''
+
+def update_edit_lyric():
+    return '''
+            UPDATE url SET lyric_url = %s
+            WHERE song_id = %s;
+            '''

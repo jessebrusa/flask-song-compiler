@@ -772,6 +772,7 @@ def edit_title(song_id):
             with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num) as conn:
                 with conn.cursor() as cur:
                     cur.execute(update_edit_title(), (input_title, song_id))
+                    conn.commit()
 
         return redirect(url_for('song_page', song_id=song_id))
 
@@ -787,6 +788,7 @@ def edit_artist(song_id):
             with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num) as conn:
                 with conn.cursor() as cur:
                     cur.execute(update_edit_artist(), (input_artist, song_id))
+                    conn.commit()
 
         return redirect(url_for('song_page', song_id=song_id))
 
@@ -802,10 +804,123 @@ def edit_img(song_id):
             with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num) as conn:
                 with conn.cursor() as cur:
                     cur.execute(update_edit_img(), (input_img, song_id))
+                    conn.commit()
 
         return redirect(url_for('song_page', song_id=song_id))
 
     return render_template('edit-img.html', song_id=song_id)
+
+
+@app.route('/edit-mp3/<int:song_id>/<string:title>', methods=['GET', 'POST'])
+def edit_mp3(song_id, title):
+    if request.method == 'POST':
+        if 'file' not in request.files:
+            return redirect(url_for('song_page', song_id=song_id))
+        
+        file = request.files['file']
+
+        if file.filename == '':
+            return redirect(url_for('song_page', song_id=song_id))
+        
+        if file:
+            filename = f'{title}.mp3'
+
+            path = f'./static/mp3/{filename}'
+
+            file.save(path)
+
+            with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num) as conn:
+                with conn.cursor() as cur:
+                    cur.execute(update_edit_mp3(), (f'.{path}', song_id))
+                    conn.commit()
+
+        return redirect(url_for('song_page', song_id=song_id))
+
+    return render_template('edit-mp3.html', song_id=song_id, title=title)
+
+
+@app.route('/edit-karaoke/<int:song_id>/<string:title>', methods=['GET', 'POST'])
+def edit_karaoke(song_id, title):
+    if request.method == 'POST':
+        if 'file' not in request.files:
+            return redirect(url_for('song_page', song_id=song_id))
+        
+        file = request.files['file']
+
+        if file.filename == '':
+            return redirect(url_for('song_page', song_id=song_id))
+        
+        if file:
+            filename = f'{title}_karaoke.mp3'
+
+            path = f'./static/karaoke/{filename}'
+
+            file.save(path)
+
+            with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num) as conn:
+                with conn.cursor() as cur:
+                    cur.execute(update_edit_karaoke(), (f'.{path}', song_id))
+                    conn.commit()
+
+        return redirect(url_for('song_page', song_id=song_id))
+
+    return render_template('edit-karaoke.html', song_id=song_id, title=title)
+
+
+@app.route('/edit-tab/<int:song_id>/<string:title>', methods=['GET', 'POST'])
+def edit_tab(song_id, title):
+    if request.method == 'POST':
+        if 'file' not in request.files:
+            return redirect(url_for('song_page', song_id=song_id))
+        
+        file = request.files['file']
+
+        if file.filename == '':
+            return redirect(url_for('song_page', song_id=song_id))
+        
+        if file:
+            filename = f'{title}.pdf'
+
+            path = f'./static/tab/{filename}'
+
+            file.save(path)
+
+            with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num) as conn:
+                with conn.cursor() as cur:
+                    cur.execute(update_edit_tab(), (f'.{path}', song_id))
+                    conn.commit()
+
+        return redirect(url_for('song_page', song_id=song_id))
+
+    return render_template('edit-tab.html', song_id=song_id, title=title)
+
+
+@app.route('/edit-lyric/<int:song_id>/<string:title>', methods=['GET', 'POST'])
+def edit_lyric(song_id, title):
+    if request.method == 'POST':
+        if 'file' not in request.files:
+            return redirect(url_for('song_page', song_id=song_id))
+        
+        file = request.files['file']
+
+        if file.filename == '':
+            return redirect(url_for('song_page', song_id=song_id))
+        
+        if file:
+            filename = f'{title}.txt'
+
+            path = f'./static/lyric/{filename}'
+
+            file.save(path)
+
+            with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num) as conn:
+                with conn.cursor() as cur:
+                    cur.execute(update_edit_lyric(), (path, song_id))
+                    conn.commit()
+
+        return redirect(url_for('song_page', song_id=song_id))
+
+    return render_template('edit-lyric.html', song_id=song_id, title=title)
 
 
 @app.route('/find-song', methods=['GET', 'POST'])
