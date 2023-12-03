@@ -536,3 +536,24 @@ def remove_user_song():
             DELETE FROM user_song
             WHERE user_id = %s AND song_id = %s;
             '''
+
+
+def update_edit_title():
+    return '''
+            UPDATE song SET title = %s
+            WHERE song_id = %s;
+            '''
+
+
+def update_edit_artist():
+    return '''
+            UPDATE song SET artist = %s
+            WHERE song_id = %s;
+            '''
+
+
+def update_edit_img():
+    return '''
+            UPDATE url SET img_url = %s
+            WHERE song_id = %s;
+            '''

@@ -46,7 +46,11 @@ class TabScraper:
                 href_value = a_element.get('href')
 
             await browser.close()
-            return href_value
+
+            if href_value == '#':
+                return None
+            else:
+                return href_value
 
     async def download_pdf(self, href):
         async with async_playwright() as p:

@@ -763,6 +763,51 @@ def get_tab(song_id):
     return redirect(url_for('song_page', song_id=song_id))
 
 
+@app.route('/edit-title/<int:song_id>', methods=['GET', 'POST'])
+def edit_title(song_id):
+    if request.method == 'POST':
+        input_title = request.form.get('title')
+
+        if input_title:
+            with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num) as conn:
+                with conn.cursor() as cur:
+                    cur.execute(update_edit_title(), (input_title, song_id))
+
+        return redirect(url_for('song_page', song_id=song_id))
+
+    return render_template('edit-title.html', song_id=song_id)
+
+
+@app.route('/edit-artist/<int:song_id>', methods=['GET', 'POST'])
+def edit_artist(song_id):
+    if request.method == 'POST':
+        input_artist = request.form.get('artist')
+
+        if input_artist:
+            with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num) as conn:
+                with conn.cursor() as cur:
+                    cur.execute(update_edit_artist(), (input_artist, song_id))
+
+        return redirect(url_for('song_page', song_id=song_id))
+
+    return render_template('edit-artist.html', song_id=song_id)
+
+
+@app.route('/edit-img/<int:song_id>', methods=['GET', 'POST'])
+def edit_img(song_id):
+    if request.method == 'POST':
+        input_img = request.form.get('img_url')
+
+        if input_img:
+            with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num) as conn:
+                with conn.cursor() as cur:
+                    cur.execute(update_edit_img(), (input_img, song_id))
+
+        return redirect(url_for('song_page', song_id=song_id))
+
+    return render_template('edit-img.html', song_id=song_id)
+
+
 @app.route('/find-song', methods=['GET', 'POST'])
 @logged_in_only
 def find_song():

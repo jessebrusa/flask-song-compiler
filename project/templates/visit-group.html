@@ -9,7 +9,11 @@
 <body class="library-body">
     {% include 'header.html' %}
     <h1 class="libraryHeader">{{ info.name }}</h1>
-        <div class="groupBodyContainerVisit">
+        {% if info.description %}
+            <p class="partyDescription">{{ info.description }}</p>
+        {% endif %}
+        <div class="groupBodyContainer">             
+            </div>
             <div class="music-card-container">
                 {% for song in songs %}
                     <div class="musicCardRemoveContainer">
@@ -24,11 +28,24 @@
                                 </div>
                             </div>
                         </a>
+                        {% if info.administrator %}
+                            <a href="{{ url_for('remove_song_from_group', party_id=info.party_id, song_id=song.song_id) }}" class="removeSong">REMOVE SONG</a>
+                        {% endif %}
                     </div>
                 {% endfor %}
             </div>
+            {% for song in songs %}
+                <a href="{{ url_for('song_page', song_id=song.song_id) }}" class="displayMobile sideCard">
+                    <div class="favCard sideCardHeight">
+                        <img src="{{ song.img_url }}" alt="image of a artist or album cover">
+                        <div class="dashboardTitleArtist sideCardTitleArtist">
+                            <h3>{{ song.title }}</h3>
+                            <h4>{{ song.artist }}</h4>
+                        </div>
+                    </div>
+                </a> 
+            {% endfor %}
         </div>
-    </div>
-    {% include 'footer.html' %}  
+    {% include 'footer.html' %} 
 </body>
 </html>
