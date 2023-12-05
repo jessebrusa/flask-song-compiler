@@ -18,9 +18,9 @@
             <input name="password" type="password" class="searchInput item2" required>
         </div>
         <input type="submit" class="submitButton">
-        {% if email_not_exist %}
+        {% if email_wrong %}
             <h3>Email not found.....</h3>
-        {% elif password_not_true %}
+        {% elif password_wrong %}
             <h3>Password incorrect</h3>
         {% endif %}
     </form>

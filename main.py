@@ -39,7 +39,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'la;sdjfaowiherojiqwke208935uijrklnwfd80ujioo23'
 login_manager = LoginManager(app)
 
-new_variable = None
+
 class User(UserMixin):
     def __init__(self, user_id, first_name, last_name, username, email, site_admin):
         self.id = user_id
