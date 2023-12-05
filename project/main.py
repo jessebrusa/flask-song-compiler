@@ -25,21 +25,21 @@ MUSIC_BRAINZ_CLIENT_SECRET = os.getenv('MUSIC_BRAINZ_CLIENT_SECRET')
 GENIUS_ACCESS_TOKEN = os.getenv('GENIUS_ACCESS_TOKEN')
 
 pg_port_num = 5433
-max_connections = 5
-connection_pool = pool.SimpleConnectionPool(
-    max_connections,
-    max_connections,
-    database='song-compiler',
-    user='postgres',
-    password=POSTGRES_PASS,
-    port=pg_port_num
-)
+# max_connections = 5
+# connection_pool = pool.SimpleConnectionPool(
+#     max_connections,
+#     max_connections,
+#     database='song-compiler',
+#     user='postgres',
+#     password=POSTGRES_PASS,
+#     port=pg_port_num
+# )
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'la;sdjfaowiherojiqwke208935uijrklnwfd80ujioo23'
 login_manager = LoginManager(app)
 
-
+new_variable = None
 class User(UserMixin):
     def __init__(self, user_id, first_name, last_name, username, email, site_admin):
         self.id = user_id
