@@ -3,3 +3,7 @@ static/karaoke/*
 static/lyric/*
 static/mp3/*
 static/tab/*
+!static/karaoke/.gitkeep
+!static/lyric/.gitkeep
+!static/mp3/.gitkeep
+!static/tab/.gitkeep
