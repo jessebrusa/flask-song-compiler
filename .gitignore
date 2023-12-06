@@ -1,5 +1,5 @@
 myenv/
-static/karaoke/
-static/lyric/
-static/mp3/
-static/tab/
+static/karaoke/*
+static/lyric/*
+static/mp3/*
+static/tab/*
