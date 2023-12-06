@@ -1,6 +1,5 @@
 myenv/
-project/.env
-project/static/karaoke/
-project/static/lyric/
-project/static/mp3/
-project/static/tab/
+static/karaoke/
+static/lyric/
+static/mp3/
+static/tab/

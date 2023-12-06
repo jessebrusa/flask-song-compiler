@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, url_for, redirect, session, jsonify
+from flask import Flask, render_template, request, url_for, redirect, session, jsonify, flash
 from flask_login import LoginManager, current_user, logout_user, login_required, UserMixin, login_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
@@ -25,11 +25,6 @@ MUSIC_BRAINZ_CLIENT_SECRET = os.getenv('MUSIC_BRAINZ_CLIENT_SECRET')
 GENIUS_ACCESS_TOKEN = os.getenv('GENIUS_ACCESS_TOKEN')
 pg_port_num = os.getenv('pg_port_num')
 
-<<<<<<<< HEAD:app.py
-========
-pg_port_num = 5433
-
->>>>>>>> 4f2462f6c9495f2de32ab6366c07617e11c37540:main.py
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'la;sdjfaowiherojiqwke208935uijrklnwfd80ujioo23'
@@ -1178,9 +1173,6 @@ def loading_page():
 @app.route('/register-page', methods=['GET', 'POST'])
 def register_page():
     if request.method == 'POST':
-        conn = pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num)
-        cur = conn.cursor()
-
         f_name = request.form.get('f_name')
         l_name = request.form.get('l_name')
         username = request.form.get('username')
@@ -1189,26 +1181,18 @@ def register_page():
 
         pass_hash = generate_password_hash(password)
 
-        new_user_sql = insert_new_user(f_name, l_name, username, email, pass_hash)
-        cur.execute(new_user_sql)
-        conn.commit()
-
-        user_id_sql = get_user(email)
-        cur.execute(user_id_sql)
-        user_id = cur.fetchone()[0]
-
-        conn.close()
+        with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num) as conn:
+            with conn.cursor() as cur:
+                cur.execute(insert_new_user(), (f_name, l_name, username, email, pass_hash))
+                user_id = cur.fetchone()[0]
 
         session['user_id'] = user_id
 
-        user_object = User(user_id, f_name, l_name, 
-                        username, email)
-
-
+        user_object = User(user_id, f_name, l_name, username, email)
         login_user(user_object)
 
         return redirect(url_for('dashboard'))
-    
+
     return render_template('register.html')
 
 
@@ -1228,59 +1212,6 @@ def login_page():
         else:
             flash('Invalid email.')
     return render_template('login.html')
-    
-    
-    # email_wrong = None
-    # password_wrong = None
-    # if request.method == 'POST':
-    #     conn = pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num)
-
-    #     email = request.form.get('email')
-    #     password_input = request.form.get('password')
-
-    #     try:
-    #         with conn.cursor() as cur:
-    #             cur.execute(get_user(), (email, ))
-    #             user = cur.fetchone()
-
-    #         if user:
-    #             user_dict = {
-    #                 'user_id': user[0],
-    #                 'first_name': user[1],
-    #                 'last_name': user[2],
-    #                 'email': user[3],
-    #                 'password': user[4],
-    #                 'username': user[5],
-    #                 'site_admin': user[6]
-    #             }
-            
-    #         password_true = check_password_hash(user_dict['password'], password_input)
-
-    #         if password_true:
-    #             session['user_id'] = user_dict['user_id']
-
-    #             user_object = User(user_dict['user_id'], user_dict['first_name'], user_dict['username'],
-    #                                user_dict['last_name'], user_dict['email'], user_dict['site_admin'])
-
-
-    #             login_user(user_object)
-              
-    #             return redirect(url_for('dashboard'))
-
-
-    #         else:
-    #             password_not_true = True
-    #             password_wrong = True
-
-    #     except:
-    #         email_not_exist = True
-    #         email_wrong = True
-
-    # email_not_exist = False
-    # password_not_true = False
-
-    return render_template('login.html', email_not_exist=email_not_exist, password_not_true=password_not_true,
-                           email_wrong=email_wrong, password_wrong=passwr)
 
 
 @app.route('/logout')

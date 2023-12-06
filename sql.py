@@ -288,26 +288,15 @@ def insert_song_search():
             '''
 
 
-def insert_new_user(f_name, l_name, username, email, password):
-    if "'" in f_name:
-        f_name = f_name.replace("'", "''")
-    if "'" in l_name:
-        l_name = l_name.replace("'", "''")
-    if "'" in username:
-        username = username.replace("'", "''")
-    if "'" in email:
-        email = email.replace("'", "''")
-    if "'" in password:
-        password = password.replace("'", "''")
-
-    return f'''
+def insert_new_user():
+    return '''
             INSERT INTO users(first_name, last_name, username, email, password)
             VALUES(
-                '{f_name}',
-                '{l_name}',
-                '{username}',
-                '{email}',
-                '{password}'
+                %s,
+                %s,
+                %s,
+                %s,
+                %s'
             )
             '''
 
