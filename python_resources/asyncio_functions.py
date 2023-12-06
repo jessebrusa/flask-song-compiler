@@ -1,7 +1,7 @@
 import asyncio
-from sql import *
-from resources import download_song, download_karaoke
-from tab_scraper import TabScraper
+from python_resources.sql import *
+from python_resources.resources import download_song, download_karaoke
+from python_resources.tab_scraper import TabScraper
 
 
 
