@@ -1234,8 +1234,7 @@ def login_page():
                 flash('Invalid password.')
         else:
             flash('Invalid email.')
-    return render_template('login.html')
-
+    return render_template('login.html')   
 
 @app.route('/logout')
 @login_required
