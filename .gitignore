@@ -6,7 +6,4 @@ static/karaoke/*
 !static/lyric/.gitkeep
 !static/mp3/.gitkeep
 !static/karaoke/.gitkeep
-git rm -r --cached static/tab/*
-git rm -r --cached static/lyric/*
-git rm -r --cached static/mp3/*
-git rm -r --cached static/karaoke/*
+.env
