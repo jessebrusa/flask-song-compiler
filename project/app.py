@@ -2,17 +2,17 @@ from flask import Flask, render_template, request, url_for, redirect, session, j
 from flask_login import LoginManager, current_user, logout_user, login_required, UserMixin, login_user
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
-from tab_scraper import TabScraper
 from all_music_scraper import AllMusicScraper
 from asyncio_functions import gather_main
 from resources import  *
 from sql import *
 import psycopg2 as pg2
-from psycopg2 import pool
+from psycopg2.errors import UniqueViolation
 from collections import namedtuple
 from dotenv import load_dotenv
 import os
 import asyncio
+
 
 
 load_dotenv()
@@ -23,17 +23,8 @@ LAST_FM_API_KEY = os.getenv('LAST_FM_API_KEY')
 MUSIC_BRAINZ_CLIENT_ID = os.getenv('MUSIC_BRAINZ_CLIENT_ID')
 MUSIC_BRAINZ_CLIENT_SECRET = os.getenv('MUSIC_BRAINZ_CLIENT_SECRET')
 GENIUS_ACCESS_TOKEN = os.getenv('GENIUS_ACCESS_TOKEN')
+pg_port_num = os.getenv('pg_port_num')
 
-pg_port_num = 5433
-max_connections = 5
-connection_pool = pool.SimpleConnectionPool(
-    max_connections,
-    max_connections,
-    database='song-compiler',
-    user='postgres',
-    password=POSTGRES_PASS,
-    port=pg_port_num
-)
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'la;sdjfaowiherojiqwke208935uijrklnwfd80ujioo23'
@@ -945,10 +936,16 @@ def find_song():
         if compare_searches_song_id:
             song_id = compare_searches_song_id[0]
 
+            
+
             with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num) as conn:
                 with conn.cursor() as cur:
-                    cur.execute(insert_user_song(), (user_id, song_id))
-                    conn.commit()
+                    try:
+                        cur.execute(insert_user_song(), (user_id, song_id))
+                        conn.commit()
+                    except pg2.errors.UniqueViolation:
+                        redirect_url = url_for('song_page', song_id=song_id)
+                        return jsonify({'redirect': redirect_url})
 
             redirect_url = url_for('song_page', song_id=song_id)
             return jsonify({'redirect': redirect_url})
@@ -956,7 +953,7 @@ def find_song():
 
 
 #########################################################################################################
-        
+                    
         else:
             try:
                 if input_artist:
@@ -969,112 +966,113 @@ def find_song():
             except:
                 redirect_url = url_for('song_not_found')
                 return jsonify({'redirect': redirect_url})
-   
+    
 #########################################################################################################
             if title is None:
                 redirect_url = url_for('song_not_found')
                 return jsonify({'redirect': redirect_url})
 
 #########################################################################################################      
-      
+        
             cur.execute(query_search_terms(), (title, ))
             compare_searches_song_id = cur.fetchone()
 
- #########################################################################################################           
-            if compare_searches_song_id:
-                new_search_term_sql = update_value(song_id, 'searches', 'search_term', input_title)
-                cur.execute(new_search_term_sql)
-                conn.commit()
+#########################################################################################################           
+        if compare_searches_song_id:
+            new_search_term_sql = update_value(song_id, 'searches', 'search_term', input_title)
+            cur.execute(new_search_term_sql)
+            conn.commit()
 
-                with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num) as conn:
-                    with conn.cursor() as cur:
+            with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num) as conn:
+                with conn.cursor() as cur:
+                    try:
                         cur.execute(insert_user_song(user_id, song_id))
                         conn.commit()
-
-                redirect_url = url_for('song_page', song_id=song_id)
-                return jsonify({'redirect': redirect_url})
-
-
-#########################################################################################################
-            cur.execute(insert_new_song(), (title, artist))
-
-            cur.execute(get_song_id(), (title, ))
-            song_id = cur.fetchone()[0]
-
-            cur.execute(insert_user_song(), (user_id, song_id))
-  
-            cur.execute(insert_new_search(), (input_title, ))
- 
-            cur.execute(search_term_id(), (input_title, ))
-            input_search_id = cur.fetchone()[0]
-
-            cur.execute(insert_song_search(), (song_id, input_search_id))
-           
-            cur.execute(insert_new_search(), (title, ))
-        
-            cur.execute(search_term_id(), (title, ))
-            search_id = cur.fetchone()[0]
-
-            cur.execute(insert_song_search(), (song_id, search_id))
-       
-
-            insert_url_sql = insert_new_record(song_id, 'url')
-            cur.execute(insert_url_sql)
-   
-
-            insert_attempt_sql = insert_new_record(song_id, 'attempt')
-            cur.execute(insert_attempt_sql)
-
-            conn.commit()
-            
-#########################################################################################################
-
-            if artist:
-                img_url = get_google_img(f'{title} {artist}', GOOGLE_API_KEY, GOOGLE_CX)
-            else:
-                img_url = get_google_img(title, GOOGLE_API_KEY, GOOGLE_CX)
-            
-            if img_url:
-                img_url_sql = update_value(song_id, 'url', 'img_url', img_url)
-                cur.execute(img_url_sql)
-                conn.commit()
-
-#########################################################################################################            
-            try:
-                lyrics = obtain_lyrics(title)
-                if lyrics is None:
-                    lyrics = get_lyrics(GENIUS_ACCESS_TOKEN, title)
-            except:
-                lyrics = None
-
-            if lyrics:
-                with open(f'./static/lyric/{title}.txt', 'w', encoding='utf-8') as file:
-                    file.write(lyrics)
-                
-                lyric_attempt_sql = update_value(song_id, 'attempt', 'lyric_check', 'true')
-                cur.execute(lyric_attempt_sql)
-                conn.commit()
-                
-                lyric_url_sql = update_value(song_id, 'url', 'lyric_url', f'./static/lyric/{title}.txt')
-                cur.execute(lyric_url_sql)
-                conn.commit()
-            
-            else:
-                lyric_attempt_sql = update_value(song_id, 'attempt', 'lyric_check', 'true')
-                cur.execute(lyric_attempt_sql)
-                conn.commit()
-#########################################################################################################
-      
-            asyncio.run(gather_main(song_id, input_mp3, input_karaoke, input_tab,
-                                    title, artist, 
-                                    cur, conn))
-        
-            conn.close()
+                    except pg2.errors.UniqueViolation:
+                        redirect_url = url_for('song_page', song_id=song_id)
+                        return jsonify({'redirect': redirect_url})
 
             redirect_url = url_for('song_page', song_id=song_id)
             return jsonify({'redirect': redirect_url})
+
+
+#########################################################################################################
+        cur.execute(insert_new_song(), (title, artist))
+
+        cur.execute(get_song_id(), (title, ))
+        song_id = cur.fetchone()[0]
+
+        cur.execute(insert_user_song(), (user_id, song_id))
+
+        cur.execute(insert_new_search(), (input_title, ))
+
+        cur.execute(search_term_id(), (input_title, ))
+        input_search_id = cur.fetchone()[0]
+
+        cur.execute(insert_song_search(), (song_id, input_search_id))
         
-           
+        cur.execute(insert_new_search(), (title, ))
+    
+        cur.execute(search_term_id(), (title, ))
+        search_id = cur.fetchone()[0]
+
+        cur.execute(insert_song_search(), (song_id, search_id))
+    
+
+        insert_url_sql = insert_new_record(song_id, 'url')
+        cur.execute(insert_url_sql)
+
+
+        insert_attempt_sql = insert_new_record(song_id, 'attempt')
+        cur.execute(insert_attempt_sql)
+
+        conn.commit()
+            
+#########################################################################################################
+
+        if artist:
+            img_url = get_google_img(f'{title} {artist}', GOOGLE_API_KEY, GOOGLE_CX)
+        else:
+            img_url = get_google_img(title, GOOGLE_API_KEY, GOOGLE_CX)
+        
+        if img_url:
+            img_url_sql = update_value(song_id, 'url', 'img_url', img_url)
+            cur.execute(img_url_sql)
+            conn.commit()
+
+#########################################################################################################            
+        lyrics = obtain_lyrics(title)
+        if lyrics is None:
+            lyrics = get_lyrics(GENIUS_ACCESS_TOKEN, title)
+
+
+        if lyrics:
+            with open(f'./static/lyric/{title}.txt', 'w', encoding='utf-8') as file:
+                file.write(lyrics)
+            
+            lyric_attempt_sql = update_value(song_id, 'attempt', 'lyric_check', 'true')
+            cur.execute(lyric_attempt_sql)
+            conn.commit()
+            
+            lyric_url_sql = update_value(song_id, 'url', 'lyric_url', f'./static/lyric/{title}.txt')
+            cur.execute(lyric_url_sql)
+            conn.commit()
+        
+        else:
+            lyric_attempt_sql = update_value(song_id, 'attempt', 'lyric_check', 'true')
+            cur.execute(lyric_attempt_sql)
+            conn.commit()
+#########################################################################################################
+      
+        asyncio.run(gather_main(song_id, input_mp3, input_karaoke, input_tab,
+                                title, artist, 
+                                cur, conn))
+    
+        conn.close()
+
+        redirect_url = url_for('song_page', song_id=song_id)
+        return jsonify({'redirect': redirect_url})
+        
 
     return render_template('find-song.html')
 

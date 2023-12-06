@@ -36,9 +36,9 @@ pyee==11.0.1
 PyGetWindow==0.0.9
 PyMsgBox==1.0.9
 PyMuPDFb==1.23.6
-pyobjc-core==10.0
-pyobjc-framework-Cocoa==10.0
-pyobjc-framework-Quartz==10.0
+# pyobjc-core==10.0
+# pyobjc-framework-Cocoa==10.0
+# pyobjc-framework-Quartz==10.0
 pyperclip==1.8.2
 PyRect==0.2.0
 pyscreenshot==3.1

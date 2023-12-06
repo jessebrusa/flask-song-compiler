@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+  song-compiler-db:
+    platform: linux/amd64 
+    networks:
+      - default
+    image: jrbrusa/song_compiler_db_image
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 'p48dT7k78n$G756JrcS%'
+      POSTGRES_DB: song-compiler
+
+  song-compiler-flask:
+    platform: linux/amd64 
+    networks: 
+      - default
+    image: jrbrusa/song_compiler_flask_image
+    ports:
+      - "5001:5001"
+    depends_on:
+      - song-compiler-db
+    environment:
+      POSTGRES_PASS: 'p48dT7k78n$G756JrcS%'
+      POSTGRES_HOST: song-compiler-db
+      POSTGRES_PORT: 5434

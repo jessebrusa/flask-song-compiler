@@ -656,15 +656,21 @@ label {
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    width: 30%;
+    max-width: 500px;
+    gap: 20px;
 }
 
 .loadingInfo {
     color: white;
     font-size: 80px;
+    margin: 20px;
 }
 
 .loadingGif {
     scale: 4;
+    max-width: 400px;
+    min-width: 200px;
 }
 
 .dashboardHeader {
