@@ -7,7 +7,7 @@
     <title>Login</title>
 </head>
 <body class="find-song-body centerVertically">
-    <div></div>
+    {% include 'header.html' %}
     <form action="{{ url_for('login_page') }}" method="POST" class="registerLogin">
         <div class="rowItems">
             <label for="title-name" class="item1">Email: </label>

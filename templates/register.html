@@ -30,6 +30,15 @@
             <input name="password" type="text" class="searchInput regSearch" required>
         </div>
         <input type="submit" class="submitButton">
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                <ul class=flashes>
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
     </form>
     {% include 'footer.html' %}
 </body>

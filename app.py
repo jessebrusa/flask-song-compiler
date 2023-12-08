@@ -57,10 +57,11 @@ class User(UserMixin, db.Model):
         return str(self.user_id)
 
 
-@login_manager.user_loader
+@app.login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
-            
+    if user_id is not None and user_id.isdigit():
+        return User.query.get(int(user_id))
+    return None
 
 def login_required(f):
     @wraps(f)
@@ -1198,23 +1199,38 @@ def register_page():
     if request.method == 'POST':
         f_name = request.form.get('f_name')
         l_name = request.form.get('l_name')
-        username = request.form.get('username')
+        username = request.form.get('username').lower()
         email = request.form.get('email')
         password = request.form.get('password')
 
         pass_hash = generate_password_hash(password)
 
-        with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num) as conn:
-            with conn.cursor() as cur:
-                cur.execute(insert_new_user(), (f_name, l_name, username, email, pass_hash))
-                user_id = cur.fetchone()[0]
+        try:
+            with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num) as conn:
+                with conn.cursor() as cur:
+                    cur.execute(insert_new_user(), (f_name, l_name, username, email, pass_hash,))
+                    user_id = cur.fetchone()[0]
+                    conn.commit()
 
-        session['user_id'] = user_id
+                    user_object = User.query.filter_by(user_id=user_id).first()
+                    login_user(user_object)
 
-        user_object = User(user_id, f_name, l_name, username, email)
-        login_user(user_object)
-
-        return redirect(url_for('dashboard'))
+                    if current_user.is_authenticated: 
+                        return redirect(url_for('dashboard'))  
+                    else:
+                        flash('There was an issue logging in. Please try again.')
+                        return redirect(url_for('login_page'))  
+                    
+        except UniqueViolation as e:
+            error_message = str(e)
+            print(error_message)
+            if 'email' in error_message:
+                print('Email already exists.')
+                flash('Email already exists.')
+                return render_template('register.html')
+            elif 'username' in error_message:
+                flash('Username already exists.')
+                return render_template('register.html')
 
     return render_template('register.html')
 
@@ -1228,7 +1244,8 @@ def login_page():
         if user:
             if check_password_hash(user.password, password_input):
                 login_user(user)
-                flash('Logged in successfully.')
+                if current_user.is_authenticated:
+                    flash('Logged in successfully.')
                 return redirect(url_for('dashboard'))
             else:
                 flash('Invalid password.')
@@ -1236,10 +1253,12 @@ def login_page():
             flash('Invalid email.')
     return render_template('login.html')   
 
+
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
+    session.clear()
     return redirect(url_for('home_page'))
 
 

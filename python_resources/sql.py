@@ -289,16 +289,12 @@ def insert_song_search():
 
 
 def insert_new_user():
-    return '''
-            INSERT INTO users(first_name, last_name, username, email, password)
-            VALUES(
-                %s,
-                %s,
-                %s,
-                %s,
-                %s'
-            )
-            '''
+    query = """
+    INSERT INTO users (first_name, last_name, username, email, password)
+    VALUES (%s, %s, %s, %s, %s)
+    RETURNING user_id;
+    """
+    return query
 
 def get_user():
     return '''
