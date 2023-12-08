@@ -1,18 +1,31 @@
 # Use Python 3.10.9 as the base image
-FROM --platform=linux/amd64 python:3.10.9
+FROM python:3.10.9
 
 # Set the working directory to /app
 WORKDIR /app
 
-# Upgrade pip and setuptools
-RUN pip install --no-cache-dir --upgrade pip setuptools
+# Install system dependencies
+RUN apt-get update && apt-get install -y gcc libpq-dev
+
+# Create a virtual environment and activate it
+RUN python -m venv venv
+ENV PATH="/app/venv/bin:$PATH"
+ENV DB_HOST=postgres
+
+# Upgrade pip
+RUN pip install --upgrade pip
+
+# Install vim
+RUN apt-get update && apt-get install -y vim
 
 # Copy the current directory contents into the container at /app
 COPY . /app
 
 # Install any needed packages specified in requirements.txt
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
+# Install playwright and its dependencies
 RUN playwright install --with-deps chromium
 
-CMD [ "flask", "run","--host","0.0.0.0","--port","5001"]
+# Run the application
+CMD ["waitress-serve", "--host=0.0.0.0", "--port=5000", "app:app"]

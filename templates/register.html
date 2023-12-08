@@ -29,6 +29,10 @@
             <label for="title-name">Password: </label>
             <input name="password" type="text" class="searchInput regSearch" required>
         </div>
+        <div class="rowItems">
+            <label for="title-name">Confirm Password: </label>
+            <input name="confirm_password" type="text" class="searchInput regSearch" required>
+        </div>
         <input type="submit" class="submitButton">
         {% with messages = get_flashed_messages() %}
             {% if messages %}
