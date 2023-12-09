@@ -1,5 +1,5 @@
-# Use Python 3.10.9 as the base image
-FROM python:3.10.9
+# Use Python 3.11.2 as the base image
+FROM python:3.11.2
 
 # Set the working directory to /app
 WORKDIR /app
@@ -27,5 +27,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Install playwright and its dependencies
 RUN playwright install --with-deps chromium
 
+# Expose port 5001
+EXPOSE 5001
+
 # Run the application
-CMD ["waitress-serve", "--host=0.0.0.0", "--port=5000", "app:app"]
+CMD ["waitress-serve", "--host=0.0.0.0", "--port=5001", "app:app"]

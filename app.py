@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, url_for, redirect, session, jsonify, flash
 from flask_login import LoginManager, current_user, logout_user, login_required, UserMixin, login_user
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
 from python_resources.all_music_scraper import AllMusicScraper
@@ -25,14 +27,17 @@ MUSIC_BRAINZ_CLIENT_ID = os.getenv('MUSIC_BRAINZ_CLIENT_ID')
 MUSIC_BRAINZ_CLIENT_SECRET = os.getenv('MUSIC_BRAINZ_CLIENT_SECRET')
 GENIUS_ACCESS_TOKEN = os.getenv('GENIUS_ACCESS_TOKEN')
 POSTGRES_URI = os.getenv('POSTGRES_URI')
-pg_port_num = os.getenv('pg_port_num')
-host='postgres'
+flask_port = os.getenv('flask_port')
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'la;sdjfaowiherojiqwke208935uijrklnwfd80ujioo23'
 app.config['SQLALCHEMY_DATABASE_URI'] = POSTGRES_URI
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
+
+engine = create_engine(POSTGRES_URI)
+Session = sessionmaker(bind=engine)
+session = Session()
 
 
 class User(UserMixin, db.Model):
@@ -86,7 +91,7 @@ def home_page():
 def library():
     user_id = current_user.user_id
 
-    with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num, host='postgres') as conn:
+    with pg2.connect(POSTGRES_URI) as conn:
         with conn.cursor() as cur:
             songs_sql = library_songs(user_id)
             Song = namedtuple('Song', library_table)
@@ -99,7 +104,7 @@ def library():
 
 @app.route('/catalogue')
 def catalogue():
-    with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num, host='postgres') as conn:
+    with pg2.connect(POSTGRES_URI) as conn:
         with conn.cursor() as cur:
             if current_user.is_authenticated:
                 user_id = current_user.user_id
@@ -121,7 +126,7 @@ def catalogue():
 def dashboard():
     user_id = current_user.user_id
 
-    with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num, host='postgres') as conn:
+    with pg2.connect(POSTGRES_URI) as conn:
         with conn.cursor() as cur:
             cur.execute(get_favorites(user_id))
             favorite_songs_list = cur.fetchall()
@@ -158,7 +163,7 @@ def dashboard():
 
 @app.route('/visit-dashboard/<int:user_id>')
 def visit_dashboard(user_id):
-    with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num, host='postgres') as conn:
+    with pg2.connect(POSTGRES_URI) as conn:
         with conn.cursor() as cur:
             cur.execute(get_username(), (user_id, ))
             username = cur.fetchone()[0]
@@ -199,7 +204,7 @@ def visit_dashboard(user_id):
 @app.route('/group-page/<int:party_id>')
 @login_required
 def group_page(party_id):
-    with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num, host='postgres') as conn:
+    with pg2.connect(POSTGRES_URI) as conn:
         with conn.cursor() as cur:
             user_id = current_user.user_id
             cur.execute(get_party_info(), (party_id, user_id))
@@ -252,7 +257,7 @@ def group_page(party_id):
 
 @app.route('/visit-group-page/<int:party_id>')
 def visit_group_page(party_id):
-    with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num, host='postgres') as conn:
+    with pg2.connect(POSTGRES_URI) as conn:
         with conn.cursor() as cur:
             cur.execute(get_party_info_visit(), (party_id, ))
             party_data = cur.fetchone()
@@ -294,7 +299,7 @@ def visit_group_page(party_id):
 def select_group(song_id):
     user_id = current_user.user_id
 
-    with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num, host='postgres') as conn:
+    with pg2.connect(POSTGRES_URI) as conn:
         with conn.cursor() as cur:
             
 
@@ -326,7 +331,7 @@ def select_group(song_id):
 @app.route('/connect-group-song/<int:party_id>/<int:song_id>')
 @login_required
 def connect_group_song(party_id, song_id):
-    with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num, host='postgres') as conn:
+    with pg2.connect(POSTGRES_URI) as conn:
         with conn.cursor() as cur:
             cur.execute(insert_party_song(), (party_id, song_id))
             conn.commit()
@@ -337,7 +342,7 @@ def connect_group_song(party_id, song_id):
 @app.route('/make-user-group-admin/<int:party_id>/<int:user_id>')
 @login_required
 def make_user_group_admin(party_id, user_id):
-    with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num, host='postgres') as conn:
+    with pg2.connect(POSTGRES_URI) as conn:
         with conn.cursor() as cur:
             cur.execute(update_user_party_admin(), (party_id, user_id))
 
@@ -347,7 +352,7 @@ def make_user_group_admin(party_id, user_id):
 @app.route('/remove-song-from-group/<int:party_id>/<int:song_id>')
 @login_required
 def remove_song_from_group(party_id, song_id):
-    with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num, host='postgres') as conn:
+    with pg2.connect(POSTGRES_URI) as conn:
         with conn.cursor() as cur:
             user_id = current_user.user_id
             cur.execute(get_party_info(), (party_id, user_id))
@@ -380,7 +385,7 @@ def remove_song_from_group(party_id, song_id):
 @app.route('/delete-group/<int:party_id>')
 @login_required
 def delete_group(party_id):
-    with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num, host='postgres') as conn:
+    with pg2.connect(POSTGRES_URI) as conn:
         with conn.cursor() as cur:
             user_id = current_user.user_id
             cur.execute(get_party_info(), (party_id, user_id))
@@ -417,14 +422,14 @@ def edit_group_name(party_id):
         new_name = request.form.get('group_name')
 
         if new_name:
-            with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num, host='postgres') as conn:
+            with pg2.connect(POSTGRES_URI) as conn:
                 with conn.cursor() as cur:
                     cur.execute(update_group_name(), (new_name, party_id))
                     conn.commit()
 
         return redirect(url_for('group_page', party_id=party_id))
 
-    with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num, host='postgres') as conn:
+    with pg2.connect(POSTGRES_URI) as conn:
         with conn.cursor() as cur:
             user_id = current_user.user_id
             cur.execute(get_party_info(), (party_id, user_id))
@@ -455,14 +460,14 @@ def edit_description(party_id):
         new_description = request.form.get('description_box')
 
         if new_description:
-            with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num, host='postgres') as conn:
+            with pg2.connect(POSTGRES_URI) as conn:
                 with conn.cursor() as cur:
                     cur.execute(update_description(), (new_description, party_id))
                     conn.commit()
 
         return redirect(url_for('group_page', party_id=party_id))
 
-    with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num, host='postgres') as conn:
+    with pg2.connect(POSTGRES_URI) as conn:
         with conn.cursor() as cur:
             user_id = current_user.user_id
             cur.execute(get_party_info(), (party_id, user_id))
@@ -493,7 +498,7 @@ def edit_description(party_id):
 @app.route('/leave-group/<int:party_id>')
 @login_required
 def leave_group(party_id):
-    with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num, host='postgres') as conn:
+    with pg2.connect(POSTGRES_URI) as conn:
         with conn.cursor() as cur:
             user_id = current_user.user_id
             cur.execute(delete_leave_group(), (user_id, party_id))
@@ -505,7 +510,7 @@ def leave_group(party_id):
 @app.route('/accept-group/<int:party_id>')
 @login_required
 def accept_group(party_id):
-    with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num, host='postgres') as conn:
+    with pg2.connect(POSTGRES_URI) as conn:
         with conn.cursor() as cur:
             user_id = current_user.user_id
             cur.execute(update_accept_group(), (user_id, party_id))
@@ -525,7 +530,7 @@ def invite_user(party_id):
         else:
             inv_admin = False
 
-        with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num, host='postgres') as conn:
+        with pg2.connect(POSTGRES_URI) as conn:
                 with conn.cursor() as cur:
                     try:
                         cur.execute(get_user_id(), (inv_username,))
@@ -546,7 +551,7 @@ def invite_user(party_id):
 def add_favorite(song_id):
     user_id = current_user.user_id
 
-    with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num, host='postgres') as conn:
+    with pg2.connect(POSTGRES_URI) as conn:
         with conn.cursor() as cur:
             cur.execute(update_add_favorite(user_id, song_id))
             conn.commit()
@@ -559,7 +564,7 @@ def add_favorite(song_id):
 def remove_favorite(song_id):
     user_id = current_user.user_id
 
-    with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num, host='postgres') as conn:
+    with pg2.connect(POSTGRES_URI) as conn:
         with conn.cursor() as cur:
             cur.execute(update_remove_favorite(user_id, song_id))
             conn.commit()
@@ -575,7 +580,7 @@ def create_group():
         description = request.form.get('description_box')
   
 
-        with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num, host='postgres') as conn:
+        with pg2.connect(POSTGRES_URI) as conn:
             with conn.cursor() as cur:
                 if description:
                     cur.execute(insert_create_group(group_name, description=description))
@@ -603,7 +608,7 @@ def create_group():
 def connect_song(song_id):
     user_id = current_user.user_id
     
-    with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num, host='postgres') as conn:
+    with pg2.connect(POSTGRES_URI) as conn:
         with conn.cursor() as cur:
             cur.execute(insert_user_song(), (user_id, song_id))
             conn.commit()
@@ -614,7 +619,7 @@ def connect_song(song_id):
 
 @app.route('/song-page/<int:song_id>')
 def song_page(song_id):
-    conn = pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num, host='postgres')
+    conn = pg2.connect(POSTGRES_URI)
     cur = conn.cursor()
     song_in_library = None
     site_admin = None
@@ -702,7 +707,7 @@ def song_page(song_id):
 
 @app.route('/mp3/<int:song_id>')
 def get_mp3(song_id):
-    conn = pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num, host='postgres')
+    conn = pg2.connect(POSTGRES_URI)
     cur = conn.cursor()
 
     sql = get_title_artist_query(song_id)
@@ -728,7 +733,7 @@ def get_mp3(song_id):
 
 @app.route('/karaoke/<int:song_id>')
 def get_karaoke(song_id):
-    conn = pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num, host='postgres')
+    conn = pg2.connect(POSTGRES_URI)
     cur = conn.cursor()
 
     sql = get_title_query(song_id)
@@ -753,7 +758,7 @@ def get_karaoke(song_id):
 
 @app.route('/tab/<int:song_id>')
 def get_tab(song_id):
-    conn = pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num, host='postgres')
+    conn = pg2.connect(POSTGRES_URI)
     cur = conn.cursor()
 
     sql = get_title_artist_query(song_id)
@@ -777,7 +782,7 @@ def edit_title(song_id):
         input_title = request.form.get('title')
 
         if input_title:
-            with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num, host='postgres') as conn:
+            with pg2.connect(POSTGRES_URI) as conn:
                 with conn.cursor() as cur:
                     cur.execute(update_edit_title(), (input_title, song_id))
                     conn.commit()
@@ -794,7 +799,7 @@ def edit_artist(song_id):
         input_artist = request.form.get('artist')
 
         if input_artist:
-            with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num, host='postgres') as conn:
+            with pg2.connect(POSTGRES_URI) as conn:
                 with conn.cursor() as cur:
                     cur.execute(update_edit_artist(), (input_artist, song_id))
                     conn.commit()
@@ -811,7 +816,7 @@ def edit_img(song_id):
         input_img = request.form.get('img_url')
 
         if input_img:
-            with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num, host='postgres') as conn:
+            with pg2.connect(POSTGRES_URI) as conn:
                 with conn.cursor() as cur:
                     cur.execute(update_edit_img(), (input_img, song_id))
                     conn.commit()
@@ -840,7 +845,7 @@ def edit_mp3(song_id, title):
 
             file.save(path)
 
-            with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num, host='postgres') as conn:
+            with pg2.connect(POSTGRES_URI) as conn:
                 with conn.cursor() as cur:
                     cur.execute(update_edit_mp3(), (f'.{path}', song_id))
                     conn.commit()
@@ -869,7 +874,7 @@ def edit_karaoke(song_id, title):
 
             file.save(path)
 
-            with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num, host='postgres') as conn:
+            with pg2.connect(POSTGRES_URI) as conn:
                 with conn.cursor() as cur:
                     cur.execute(update_edit_karaoke(), (f'.{path}', song_id))
                     conn.commit()
@@ -898,7 +903,7 @@ def edit_tab(song_id, title):
 
             file.save(path)
 
-            with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num, host='postgres') as conn:
+            with pg2.connect(POSTGRES_URI) as conn:
                 with conn.cursor() as cur:
                     cur.execute(update_edit_tab(), (f'.{path}', song_id))
                     conn.commit()
@@ -927,7 +932,7 @@ def edit_lyric(song_id, title):
 
             file.save(path)
 
-            with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num, host='postgres') as conn:
+            with pg2.connect(POSTGRES_URI) as conn:
                 with conn.cursor() as cur:
                     cur.execute(update_edit_lyric(), (path, song_id))
                     conn.commit()
@@ -941,7 +946,7 @@ def edit_lyric(song_id, title):
 @login_required
 def find_song():
     if request.method == 'POST':
-        conn = pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num, host='postgres')
+        conn = pg2.connect(POSTGRES_URI)
         cur = conn.cursor()
 
         input_title = request.form.get('title')
@@ -961,7 +966,7 @@ def find_song():
 
             
 
-            with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num, host='postgres') as conn:
+            with pg2.connect(POSTGRES_URI) as conn:
                 with conn.cursor() as cur:
                     try:
                         cur.execute(insert_user_song(), (user_id, song_id))
@@ -1006,7 +1011,7 @@ def find_song():
             cur.execute(new_search_term_sql)
             conn.commit()
 
-            with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num, host='postgres') as conn:
+            with pg2.connect(POSTGRES_URI) as conn:
                 with conn.cursor() as cur:
                     try:
                         cur.execute(insert_user_song(user_id, song_id))
@@ -1103,7 +1108,7 @@ def find_song():
 @app.route('/remove-song/<int:song_id>')
 def remove_song(song_id):
     user_id = current_user.user_id
-    with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num, host='postgres') as conn:
+    with pg2.connect(POSTGRES_URI) as conn:
         with conn.cursor() as cur:
             cur.execute(remove_user_song(), (user_id, song_id))
             conn.commit()
@@ -1113,7 +1118,7 @@ def remove_song(song_id):
 @app.route('/delete-song/<int:song_id>')
 @login_required
 def delete_song(song_id):
-    with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num, host='postgres') as conn:
+    with pg2.connect(POSTGRES_URI) as conn:
         with conn.cursor() as cur:
             song_page_sql = song_page_info(song_id)
             cur.execute(song_page_sql)
@@ -1208,7 +1213,7 @@ def register_page():
             pass_hash = generate_password_hash(password)
 
             try:
-                with pg2.connect(database='song-compiler', user='postgres', password=POSTGRES_PASS, port=pg_port_num, host='postgres') as conn:
+                with pg2.connect(POSTGRES_URI) as conn:
                     with conn.cursor() as cur:
                         cur.execute(insert_new_user(), (f_name, l_name, username, email, pass_hash,))
                         user_id = cur.fetchone()[0]
@@ -1250,8 +1255,6 @@ def login_page():
         if user:
             if check_password_hash(user.password, password_input):
                 login_user(user)
-                if current_user.is_authenticated:
-                    flash('Logged in successfully.')
                 return redirect(url_for('dashboard'))
             else:
                 flash('Invalid password.')
@@ -1264,9 +1267,9 @@ def login_page():
 @login_required
 def logout():
     logout_user()
-    session.clear()
+    session.pop('user_id', None)
     return redirect(url_for('home_page'))
 
 
 if __name__ == '__main__':
-    app.run(port=5000, host='0.0.0.0')
+    app.run(port=flask_port, host='0.0.0.0')
