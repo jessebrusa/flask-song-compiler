@@ -1069,10 +1069,7 @@ def find_song():
             conn.commit()
 
 #########################################################################################################            
-        lyrics = obtain_lyrics(title)
-        if lyrics is None:
-            lyrics = get_lyrics(GENIUS_ACCESS_TOKEN, title)
-
+        lyrics = get_lyrics(GENIUS_ACCESS_TOKEN, title)
 
         if lyrics:
             with open(f'./static/lyric/{title}.txt', 'w', encoding='utf-8') as file:
